@@ -9,6 +9,6 @@ matplotlib
 seaborn
 gsheetsdb==0.1.13
 gspread
-GoogleOAuth2==1.30.0
+GoogleOAuth2
 secure-smtplib ==0.1.0
 ssl == 1.16
