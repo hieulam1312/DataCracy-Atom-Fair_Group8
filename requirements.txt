@@ -9,6 +9,11 @@ matplotlib
 seaborn
 gsheetsdb==0.1.13
 gspread
-GoogleOAuth2
 secure-smtplib ==0.1.0
 ssl == 1.16
+requests-oauthlib==1.3.0
+gspread_dataframe
+matplotlib
+seaborn
+gsheetsdb==0.1.13
+gspread
