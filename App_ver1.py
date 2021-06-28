@@ -99,7 +99,7 @@ list_BSEM=BSEM_list.index.tolist()
 Take_action=['Warning for first academic year','Warning for second academic year']
 
 def main():
-    if st.button('Send warning mail'):
+    if st.sidebar.button('Send warning mail'):
         email_sender=st.text_input('Enter User Email: ')
         password=st.text_input('Enter User password: ',type='password')
 
@@ -149,7 +149,7 @@ sns.barplot(data=_pass18,x="Intake",y="Scores")
 st.pyplot(fig)
 #Phân bố điểm của lớp
 
-st.selectbox('Enter Student ID:',data_df['Student_ID'])
+st.sidebar.selectbox('Enter Student ID:',data_df['Student_ID'])
 
 #B. SEND MAIL BOT
 if __name__=="__main__":
