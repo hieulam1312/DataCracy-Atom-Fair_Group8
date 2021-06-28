@@ -1,6 +1,7 @@
 import streamlit as st
 import smtplib
 from PIL import Image
+from win32com.client import Dispatch
 import re #-> Để xử lý data dạng string
 from datetime import datetime as dt #-> Để xử lý data dạng datetime
 import gspread #-> Để update data lên Google Spreadsheet
@@ -23,6 +24,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 pd.plotting.register_matplotlib_converters()
 import matplotlib.pyplot as plt
+from win32com.client import Dispatch
 
 # Create a connection object.
 credentials = service_account.Credentials.from_service_account_info(
@@ -106,8 +108,7 @@ list_BSEM=BSEM_list.index.tolist()
 
 #EDA - DASHBOARD OPERATION
 
-img1 = mpimg.imread('vgu_logo.png')
-st.image(img1, width =160)
+
 st.markdown("<h1 style='text-align: center; color: blue;font-style:bold'>PEFORMANCE STUDY</h1>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: right; color:black;font-style: italic'> Created by Group 8 - Atom Fair</h4>", unsafe_allow_html=True)
 st.markdown("")
