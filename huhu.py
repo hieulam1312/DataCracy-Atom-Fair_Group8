@@ -1,13 +1,10 @@
 import streamlit as st
-import smtplib
-from PIL import Image
+
 import re #-> Để xử lý data dạng string
 from datetime import datetime as dt #-> Để xử lý data dạng datetime
-import gspread #-> Để update data lên Google Spreadsheet
-from gspread_dataframe import set_with_dataframe #-> Để update data lên Google Spreadsheet
+
 import numpy as np
 import pandas as pd #-> Để update data dạng bản
-import json 
 
 import matplotlib.image as mpimg
 from google.oauth2 import service_account
@@ -17,7 +14,6 @@ from datetime import datetime as dt
 from typing import Text
 from numpy.core.numeric import NaN
 import streamlit as st
-import json
 
 from streamlit.elements import empty
 pd.plotting.register_matplotlib_converters()
