@@ -77,6 +77,7 @@ def transform(df):
     a=a.reset_index()
     st.title('DATASET OF MARKS')
     st.markdown("histogram of marks")
+    st.set_option('deprecation.showPyplotGlobalUse', False)
     sns.set(style='darkgrid', font_scale=1.0, rc={"figure.figsize": [14, 6]})
     f, ax = plt.subplots(1, 1, figsize=(14, 6))
     g = sns.histplot(x=first_df.Scores, data=first_df, ax=ax)
