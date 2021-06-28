@@ -1,6 +1,7 @@
 import streamlit as st
 import smtplib
 from PIL import Image
+from win32com.client import Dispatch
 import re #-> Để xử lý data dạng string
 from datetime import datetime as dt #-> Để xử lý data dạng datetime
 import gspread #-> Để update data lên Google Spreadsheet
@@ -8,6 +9,7 @@ from gspread_dataframe import set_with_dataframe #-> Để update data lên Goog
 import numpy as np
 import pandas as pd #-> Để update data dạng bản
 import json 
+
 import matplotlib.image as mpimg
 from google.oauth2 import service_account
 from gsheetsdb import connect
@@ -22,7 +24,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 pd.plotting.register_matplotlib_converters()
 import matplotlib.pyplot as plt
-
+from win32com.client import Dispatch
 
 # Create a connection object.
 credentials = service_account.Credentials.from_service_account_info(
@@ -49,6 +51,13 @@ data=sh2.get_all_records()
 data_df=pd.DataFrame(data)
 data_df=data_df.replace((0,np.nan))
 data_df.columns=data_df.columns.str.replace(" ","_")
+
+#EDA - DASHBOARD OPERATION
+
+data_df['Intake'].value_counts().plot.pie()
+
+
+#B. SEND MAIL BOT
 ds_df=data_df.melt(id_vars=['Student_ID','Intake','NOTE'],var_name='Object',value_name='Scores')
 
 #List of subject
@@ -78,7 +87,7 @@ warning_list2=list2.Student_ID.tolist()
 
 
 #List pass B
-_passB=_pass.loc[_pass.Object.str.startswith('B')]
+_passB=_pass.loc[_pass.Object.str.contains('B')]
 count_passB=_passB.groupby(['Student_ID','Object']).count()
 count_passB=count_passB.reset_index()
 _2=['BFIN','BACC','BMGT']
@@ -95,34 +104,7 @@ BSEM=_pass.groupby('Student_ID').Object.count()
 BSEM_list=BSEM.loc[BSEM.values==18]
 list_BSEM=BSEM_list.index.tolist()
 
-#CREATED SEND MAIL BOT
-Take_action=['Warning for first academic year','Warning for second academic year']
 
-def main():
-    if st.sidebar.button('Send warning mail'):
-        email_sender=st.text_input('Enter User Email: ')
-        password=st.text_input('Enter User password: ',type='password')
-
-        for i in Take_action:
-            st.button(i)
-            if i=='Warning for first academic year':  
-                for y in warning_list1:
-                    email=email_list.loc[email_list.Student_ID==y]
-
-            elif i=='Warning for second academic year':
-                for z in warning_list2:
-                    email=email_list.loc[email_list.Student_ID==z]
-        
-        email_reciever=email['Email'].to_string(index=False)
-        subject=st.text_input('Subject: ')
-        body=st.text_area('Context')
-        if st.button("Send Email"):
-            session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
-            session.starttls() #enable security
-            session.login(email_sender, password) #login with mail_id and password
-            messages="Subject: {}\n\n{}".format(subject,body)
-            session.sendmail(email_sender, email_reciever,messages)
-            session.quit()
 
 #EDA - DASHBOARD OPERATION
 
@@ -151,7 +133,66 @@ st.pyplot(fig)
 
 st.sidebar.selectbox('Enter Student ID:',data_df['Student_ID'])
 
-#B. SEND MAIL BOT
-if __name__=="__main__":
-    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#CREATED SEND MAIL BOT
+Take_action=['Warning for first academic year','Warning for second academic year']
+
+
+def main():
+    email_sender=st.text_input('Enter User Email: ')
+    password=st.text_input('Enter User password: ',type='password')
+
+    for i in Take_action:
+        st.button(i)
+        if i=='Warning for first academic year':  
+            for y in warning_list1:
+                email=email_list.loc[email_list.Student_ID==y]
+
+        elif i=='Warning for second academic year':
+            for z in warning_list2:
+                email=email_list.loc[email_list.Student_ID==z]
+    
+    email_reciever=email['Email'].to_string(index=False)
+    subject=st.text_input('Subject: ')
+    body=st.text_area('Context')
+    if st.button("Send Email"):
+        session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+        session.starttls() #enable security
+        session.login(email_sender, password) #login with mail_id and password
+        messages="Subject: {}\n\n{}".format(subject,body)
+        session.sendmail(email_sender, email_reciever,messages)
+        session.quit()
+
+main()
 
