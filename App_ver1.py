@@ -1,7 +1,6 @@
 import streamlit as st
 import smtplib
 from PIL import Image
-from win32com.client import Dispatch
 import re #-> Để xử lý data dạng string
 from datetime import datetime as dt #-> Để xử lý data dạng datetime
 import gspread #-> Để update data lên Google Spreadsheet
@@ -24,7 +23,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 pd.plotting.register_matplotlib_converters()
 import matplotlib.pyplot as plt
-from win32com.client import Dispatch
 
 # Create a connection object.
 credentials = service_account.Credentials.from_service_account_info(
