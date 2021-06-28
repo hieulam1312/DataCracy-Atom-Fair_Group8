@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 pd.plotting.register_matplotlib_converters()
 import matplotlib.pyplot as plt
-from win32com.client import Dispatch
+
 
 # Create a connection object.
 credentials = service_account.Credentials.from_service_account_info(
