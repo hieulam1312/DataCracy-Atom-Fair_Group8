@@ -107,7 +107,7 @@ def transform(df):
     else:
       sns.barplot(data=_pass18,x=_pass18[index2],y="Scores")
       st.pyplot()
-
+    st.set_option('deprecation.showPyplotGlobalUse', False)
     st.markdown('RATIO')
     a.plot(x='Intake', y=['Terminate','Doing'], kind="bar")
     st.pyplot()
