@@ -50,28 +50,6 @@ data_df=pd.DataFrame(data)
 data_df=data_df.replace((0,np.nan))
 data_df.columns=data_df.columns.str.replace(" ","_")
 ds_df=data_df.melt(id_vars=['Student_ID','Intake','NOTE'],var_name='Object',value_name='Scores')
-#EDA - DASHBOARD OPERATION
-
-img1 = mpimg.imread('vgu_logo.png')
-st.image(img1, width =160)
-st.markdown("<h1 style='text-align: center; color: blue;font-style:bold'>PEFORMANCE STUDY</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align: right; color:black;font-style: italic'> Created by Group 8</h4>", unsafe_allow_html=True)
-
-#Count of class
-
-fig, ax = plt.subplots()
-data_df['Intake'].value_counts().plot.bar()
-st.pyplot(fig)
-
-#Phân bố điểm của lớp
-
-st.selectbox('Enter Student ID:',data_df['Student_ID'])
-
-fig = plt.figure()
-st.pyplot(fig)
-
-#B. SEND MAIL BOT
-
 
 #List of subject
 list_O=['OBRW','OVWL','OFIN','OMAT','OSTA','OWIN','OREC','OMAR']
@@ -100,7 +78,7 @@ warning_list2=list2.Student_ID.tolist()
 
 
 #List pass B
-_passB=_pass.loc[_pass.Object.str.contains('B')]
+_passB=_pass.loc[_pass.Object.str.startswith('B')]
 count_passB=_passB.groupby(['Student_ID','Object']).count()
 count_passB=count_passB.reset_index()
 _2=['BFIN','BACC','BMGT']
@@ -146,7 +124,34 @@ def main():
             session.sendmail(email_sender, email_reciever,messages)
             session.quit()
 
+#EDA - DASHBOARD OPERATION
 
+img1 = mpimg.imread('vgu_logo.png')
+st.image(img1, width =160)
+st.markdown("<h1 style='text-align: center; color: blue;font-style:bold'>PEFORMANCE STUDY</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align: right; color:black;font-style: italic'> Created by Group 8 - Atom Fair</h4>", unsafe_allow_html=True)
+st.markdown("")
+#Count of class
+
+#Số lượng pass O và 18 môn
+O=_pass.loc[_pass.Object.str.startswith('O')].groupby('Intake').count()
+_passO=O.reset_index()
+l=_pass.groupby(['Intake','Student_ID']).count()
+l=l.reset_index()
+_pass18=l.loc[l.Scores>=18]
+st.markdown('### SỐ LƯỢNG SINH VIÊN ĐẬU MÔN O THEO LỚP')
+fig, ax = plt.subplots()
+sns.barplot(data=_passO,x="Intake",y="Scores")
+st.pyplot(fig)
+st.markdown("")
+st.markdown("### SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG 18 MÔN O,B,P")
+sns.barplot(data=_pass18,x="Intake",y="Scores")
+st.pyplot(fig)
+#Phân bố điểm của lớp
+
+st.selectbox('Enter Student ID:',data_df['Student_ID'])
+
+#B. SEND MAIL BOT
 if __name__=="__main__":
     main()
 
