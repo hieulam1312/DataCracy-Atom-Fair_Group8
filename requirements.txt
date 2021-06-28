@@ -15,5 +15,4 @@ matplotlib
 seaborn
 gsheetsdb==0.1.13
 gspread
-pywin32
 win32com.client
