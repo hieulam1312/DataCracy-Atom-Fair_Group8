@@ -21,7 +21,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 pd.plotting.register_matplotlib_converters()
 import matplotlib.pyplot as plt
-from pandas_profiling import ProfileReport
 from streamlit_pandas_profiling import st_profile_report
 
 def get_df(file):
@@ -96,15 +95,16 @@ def transform(df):
     st.set_option('deprecation.showPyplotGlobalUse', False)
     st.pyplot()
 
-    st.markdown('### SỐ LƯỢNG SINH VIÊN ĐẬU MÔN O THEO LỚP')
+    st.markdown('### SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN NỀN TẢNG')
     fig, ax = plt.subplots()
     sns.barplot(data=first_pass,x=first_pass[index2],y="Scores")
     st.pyplot()
     st.markdown("")
-    st.markdown("### SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG 18 MÔN O,B,P")
+    st.markdown("### SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN BẮT BUỘC")
     if len(_pass18)==0:
       st.write("No one student in here")
     else:
+      st.set_option('deprecation.showPyplotGlobalUse', False)
       sns.barplot(data=_pass18,x=_pass18[index2],y="Scores")
       st.pyplot()
     st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -163,14 +163,14 @@ def main():
     if not file1:
         st.write("Upload a .csv or .xlsx file to get started")
     else:
-        df = get_df(file1)
-        data_df=df.replace((0,np.nan))
-        data_df.columns=data_df.columns.str.replace(" ","_")
-        if st.sidebar.button('Operation Dashboard'):
+      df = get_df(file1)
+      data_df=df.replace((0,np.nan))
+      data_df.columns=data_df.columns.str.replace(" ","_")
+      choose=st.sidebar.selectbox('Enter your choose:',['Operation Dashboard','Student checking'])
+      if choose=='Operation Dashboard':
           transform(df)
-        else:
+      else:
           st.write("")
-    return transform(df)  
 
 main()
 
