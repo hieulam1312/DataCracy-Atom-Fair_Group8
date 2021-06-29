@@ -179,7 +179,6 @@ def transform(df,email_list):
           session.quit()
     sendmail(email_list)
 
-
 def main():
     st.title('Student a dataset')
     files = st.file_uploader("Upload file", type=['csv','xlsx','pickle'],accept_multiple_files=True)
