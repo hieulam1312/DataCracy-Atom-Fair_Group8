@@ -13,8 +13,7 @@ from datetime import datetime, timedelta
 from datetime import datetime as dt
 from typing import Text
 from numpy.core.numeric import NaN
-import streamlit as st
-
+import logging.handlers
 from streamlit.elements import empty
 pd.plotting.register_matplotlib_converters()
 import matplotlib.pyplot as plt
@@ -162,22 +161,23 @@ def transform(df,email_list):
     BSEM_list=BSEM.loc[BSEM.values==18]
     list_BSEM=BSEM_list.index.tolist()   
     def sendmail(email_list):
-        email_sender=st.text_input('Enter User Email: ')
-        password=st.text_input('Enter User password: ',type='password')
-        email_reciever=""
-        _list=mail(email_list,warning_list1,warning_list2)
-        subject=st.text_input('Subject: ')
-        body=st.text_area('Context')
-        for i in _list :
-          email_reciever=i
-          session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
-          session.starttls() #enable security
-          session.login(email_sender, password) #login with mail_id and password   
-          messages="Subject: {}\n\n{}".format(subject,body)  
-          session.sendmail(email_sender,email_reciever,messages)
-          session.quit()
+          email_sender=st.text_input('Enter User Email: ')
+          password=st.text_input('Enter User password: ',type='password')
+          email_reciever=""
+          _list=mail(email_list,warning_list1,warning_list2)
+          subject=st.text_input('Subject: ')
+          body=st.text_area('Context')
+          st.button('Send!')
+          for i in _list :
+            email_reciever=i
+            session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+            session.starttls() #enable security
+            session.login(email_sender, password) #login with mail_id and password   
+            messages="Subject: {}\n\n{}".format(subject,body)  
+            session.sendmail(email_sender,email_reciever,messages)
+            session.quit()
     sendmail(email_list)
-
+       
 def main():
     st.title('Student a dataset')
     files = st.file_uploader("Upload file", type=['csv','xlsx','pickle'],accept_multiple_files=True)
