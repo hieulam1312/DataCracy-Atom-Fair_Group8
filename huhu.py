@@ -1,11 +1,11 @@
 import streamlit as st
-
+import smtplib
 import re #-> Để xử lý data dạng string
 from datetime import datetime as dt #-> Để xử lý data dạng datetime
 
 import numpy as np
 import pandas as pd #-> Để update data dạng bản
-
+pd.plotting.register_matplotlib_converters()
 import matplotlib.image as mpimg
 from google.oauth2 import service_account
 from gsheetsdb import connect
@@ -34,7 +34,7 @@ def get_df(file):
     df = pd.read_pickle(file)
   return df.replace((" ",np.nan))
 
-def transform(df):
+def transform(df,email_list):
   # SUMMARY
     df_types = pd.DataFrame(df.dtypes, columns=['Data Type'])
     numerical_cols = df_types[~df_types['Data Type'].isin(['object',
@@ -112,13 +112,6 @@ def transform(df):
     st.markdown('RATIO')
     a.plot(x='Intake', y=['Terminate','Doing'], kind="bar")
     st.pyplot()
-#Phân bố điểm của lớp
-
-
-
-
-
-
     #warning list 1:
     year=st.sidebar.slider("Years", min_value=2014, max_value=2021, step=1)
     warning_list1=[]
@@ -156,23 +149,58 @@ def transform(df):
     BSEM_list=BSEM.loc[BSEM.values==18]
     list_BSEM=BSEM_list.index.tolist()
 
+    c=st.selectbox('Choose warning mail for:',['First academic year','Second academic year'])
+    if c== 'First academic year':  
+      email_sender=st.text_input('Enter User Email: ')
+      password=st.text_input('Enter User password: ',type='password')
+      subject=st.text_input('Subject: ')
+      body=st.text_area('Context')
+      for y in warning_list1:
+        email=email_list.loc[email_list.Student_ID==y]
+      email_reciever=email['Email'].to_string(index=False)
+      if st.button("Send Email"):
+        session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+        session.starttls() #enable security
+        session.login(email_sender, password) #login with mail_id and password
+        messages="Subject: {}\n\n{}".format(subject,body)
+        session.sendmail(email_sender, email_reciever,messages)
+        session.quit()
+
+    else: 
+      for z in warning_list2:
+        email=email_list.loc[email_list.Student_ID==y]
+        email_reciever=email['Email'].to_string(index=False)
+        email_sender=st.text_input('Enter User Email: ')
+        password=st.text_input('Enter User password: ',type='password')
+        subject=st.text_input('Subject: ')
+        body=st.text_area('Context')
+        if st.button("Send Email"):
+          session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+          session.starttls() #enable security
+          session.login(email_sender, password) #login with mail_id and password
+          messages="Subject: {}\n\n{}".format(subject,body)
+          session.sendmail(email_sender, email_reciever,messages)
+          session.quit()
+
+
+
 
 
 def main():
     st.title('Student a dataset')
-    file1 = st.file_uploader("Upload file", type=['csv','xlsx','pickle'])
-    if not file1:
+    files = st.file_uploader("Upload file", type=['csv','xlsx','pickle'],accept_multiple_files=True)
+    if not files:
         st.write("Upload a .csv or .xlsx file to get started")
     else:
-      df = get_df(file1)
+      df = get_df(files[0])
+      email_list=get_df(files[1])
       data_df=df.replace((0,np.nan))
       data_df.columns=data_df.columns.str.replace(" ","_")
       choose=st.sidebar.selectbox('Enter your choose:',['Operation Dashboard','Student checking'])
       if choose=='Operation Dashboard':
-          transform(df)
+          transform(df,email_list)   
       else:
           st.write("")
-
 main()
 
 
