@@ -168,7 +168,6 @@ def transform(df,email_list):
         _list=mail(email_list,warning_list1,warning_list2)
         subject=st.text_input('Subject: ')
         body=st.text_area('Context')
-        st.button('Send!')
         for i in _list :
           email_reciever=i
           session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
