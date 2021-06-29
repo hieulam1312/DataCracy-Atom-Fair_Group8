@@ -34,6 +34,18 @@ def get_df(file):
     df = pd.read_pickle(file)
   return df.replace((" ",np.nan))
 
+def mail(email_list,list1,list2):
+      email=""
+      if st.button('Warning for first academic year'):  
+          for y in list1:
+            email=email_list.loc[email_list.index==y]
+            email=email['Email'].tolist()
+      if st.button('Warning for second academic year'):
+          for z in list2:
+            email=email_list.loc[email_list.index==z]
+            email=email['Email'].tolist()
+      return email
+   
 def transform(df,email_list):
   # SUMMARY
     df_types = pd.DataFrame(df.dtypes, columns=['Data Type'])
@@ -49,6 +61,7 @@ def transform(df,email_list):
     index1=index[0]
     index2=index[1]
     index3=index[2]
+    email_list=email_list.set_index(index1)
     df=df.set_index([index1,index2,index3])
     first_cols=st.sidebar.multiselect('First academic Object names',
                         numerical_cols.tolist(),
@@ -128,9 +141,9 @@ def transform(df,email_list):
     #Warning list 2:
     sub=['2015','2016','2017','2018']
     for i in sub:
-        list2=first_fail.loc[first_fail[index2].str.contains(i)]
-    warning_list2=list2[index1].tolist()
+      list2=first_fail.loc[first_fail[index2].str.contains(i)]
     
+    warning_list2=list2[index1].tolist()
     #List pass B
     _passB=ds_pass.loc[ds_pass.Object.str.contains('B')]
     count_passB=_passB.groupby([ds_pass[index1],ds_pass.Object]).count()
@@ -147,43 +160,24 @@ def transform(df,email_list):
     list_BSEM=[]
     BSEM=ds_pass.groupby(ds_pass[index1]).Object.count()
     BSEM_list=BSEM.loc[BSEM.values==18]
-    list_BSEM=BSEM_list.index.tolist()
-
-    c=st.selectbox('Choose warning mail for:',['First academic year','Second academic year'])
-    if c== 'First academic year':  
-      email_sender=st.text_input('Enter User Email: ')
-      password=st.text_input('Enter User password: ',type='password')
-      subject=st.text_input('Subject: ')
-      body=st.text_area('Context')
-      for y in warning_list1:
-        email=email_list.loc[email_list.Student_ID==y]
-      email_reciever=email['Email'].to_string(index=False)
-      if st.button("Send Email"):
-        session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
-        session.starttls() #enable security
-        session.login(email_sender, password) #login with mail_id and password
-        messages="Subject: {}\n\n{}".format(subject,body)
-        session.sendmail(email_sender, email_reciever,messages)
-        session.quit()
-
-    else: 
-      for z in warning_list2:
-        email=email_list.loc[email_list.Student_ID==y]
-        email_reciever=email['Email'].to_string(index=False)
+    list_BSEM=BSEM_list.index.tolist()   
+    def sendmail(email_list):
         email_sender=st.text_input('Enter User Email: ')
         password=st.text_input('Enter User password: ',type='password')
+        email_reciever=""
+        _list=mail(email_list,warning_list1,warning_list2)
         subject=st.text_input('Subject: ')
         body=st.text_area('Context')
-        if st.button("Send Email"):
+        st.button('Send!')
+        for i in _list :
+          email_reciever=i
           session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
           session.starttls() #enable security
-          session.login(email_sender, password) #login with mail_id and password
-          messages="Subject: {}\n\n{}".format(subject,body)
-          session.sendmail(email_sender, email_reciever,messages)
+          session.login(email_sender, password) #login with mail_id and password   
+          messages="Subject: {}\n\n{}".format(subject,body)  
+          session.sendmail(email_sender,email_reciever,messages)
           session.quit()
-
-
-
+    sendmail(email_list)
 
 
 def main():
@@ -194,11 +188,12 @@ def main():
     else:
       df = get_df(files[0])
       email_list=get_df(files[1])
+      email_list=email_list.replace((0,np.nan))
       data_df=df.replace((0,np.nan))
       data_df.columns=data_df.columns.str.replace(" ","_")
       choose=st.sidebar.selectbox('Enter your choose:',['Operation Dashboard','Student checking'])
       if choose=='Operation Dashboard':
-          transform(df,email_list)   
+          transform(df,email_list)
       else:
           st.write("")
 main()
