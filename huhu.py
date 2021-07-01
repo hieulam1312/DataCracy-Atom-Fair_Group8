@@ -91,7 +91,7 @@ def transform(df,email_list):
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     category=['object','bool']
     df_types = pd.DataFrame(df.dtypes, columns=['Data Type'])
-
+    _pass=st.sidebar.number_input('Enter mark to pass exam:', step=1)
     numerical_cols = df.select_dtypes(include=numerics)
     category_cols=  df.select_dtypes(include=category)
     email_list=email_list.set_index(index1)
@@ -101,7 +101,7 @@ def transform(df,email_list):
     second_cols=st.sidebar.multiselect('Second academic Object names',
                         numerical_cols.columns.tolist(),
                         numerical_cols.columns.tolist())
-    _pass=st.sidebar.number_input('Enter mark to pass exam:', step=1)
+
     ds_df=df.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
     first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
     second_df=df[second_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
