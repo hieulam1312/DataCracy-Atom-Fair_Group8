@@ -102,7 +102,7 @@ def transform(df):
     second_cols=st.sidebar.multiselect('Các môn bắt buộc nhóm 2 / môn nền tảng năm 2',
                         numerical_cols.columns.tolist(),
                         numerical_cols.columns.tolist())
-
+    num=st.sidebar.number_input('Tổng số môn học bắt buộc:',step=1)
     ds_df=df.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
     first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
     second_df=df[second_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
@@ -111,7 +111,9 @@ def transform(df):
     ds_pass=ds_df.loc[ds_df.Scores>=_pass]
     l=ds_pass.groupby([ds_pass[index1],ds_pass[index2]]).count()
     l=l.reset_index()
-    _pass18=l.loc[l.Scores>=18]
+    _pass18=l.loc[l.Scores>=num]
+    pass18=_pass18.groupby(_pass18[index2]).count()
+    pass18= pass18.reset_index()
     ds_terminate=ds_df.loc[(ds_df[index3].isnull()==False)] 
     terminate=ds_terminate.groupby(ds_terminate[index2]).count()
     ds_doing=ds_df.loc[(ds_df[index3].isnull()==True)]
@@ -123,13 +125,19 @@ def transform(df):
     a=a.reset_index()
     st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
     st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
-    st.set_option('deprecation.showPyplotGlobalUse', False)
-    sns.set(style='darkgrid', font_scale=1.0, rc={"figure.figsize": [14, 6]})
-    f, ax = plt.subplots(1, 1, figsize=(14, 6))
-    g = sns.histplot(x=first_df.Scores, data=first_df, ax=ax)
 
-    ax.set_ylabel('Sinh viên')
-    ax.set_xlabel('Điểm số')
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    hu=sns.FacetGrid(first_df,row=index2,col='Object')
+    hu.map(sns.histplot,'Scores')
+    sns.set(style='darkgrid', font_scale=1.0, rc={"figure.figsize": [60,20]})
+  
+
+
+
+    # f, ax = plt.subplots(1, 1, figsize=(14, 6))
+    # g = sns.histplot(x=first_df.Scores, data=first_df, ax=ax)
+    # ax.set_ylabel('Sinh viên')
+    # ax.set_xlabel('Điểm số')
     st.pyplot()
 
     st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -148,11 +156,11 @@ def transform(df):
     st.pyplot()
     st.markdown("")
     st.markdown("### 4. SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN BẮT BUỘC")
-    if len(_pass18)==0:
+    if len(pass18)==0:
       st.write("Chưa có sinh viên nào hoàn thành tất cả các môn học")
     else:
       st.set_option('deprecation.showPyplotGlobalUse', False)
-      sns.barplot(data=_pass18,x=_pass18[index2],y="Scores")
+      sns.barplot(data=pass18,x=index2,y=index1)
       st.pyplot()
     st.set_option('deprecation.showPyplotGlobalUse', False)
     st.markdown('### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
