@@ -2,7 +2,8 @@ import streamlit as st
 import smtplib
 import re #-> Để xử lý data dạng string
 from datetime import datetime as dt #-> Để xử lý data dạng datetime
-
+import base64
+from io import BytesIO
 import numpy as np
 import pandas as pd #-> Để update data dạng bản
 pd.plotting.register_matplotlib_converters()
@@ -33,41 +34,64 @@ def get_df(file):
     df = pd.read_pickle(file)
   return df.replace((" ",np.nan))
 
-def mail(email_list,list1,list2):
-      email=""
-      if st.button('Warning for first academic year'):  
-          for y in list1:
-            email=email_list.loc[email_list.index==y]
-            email=email['Email'].tolist()
-      if st.button('Warning for second academic year'):
-          for z in list2:
-            email=email_list.loc[email_list.index==z]
-            email=email['Email'].tolist()
-      return email
+def check_student(df,id):
+    id_column=st.sidebar.selectbox('Chosse index:',
+                        df.columns.tolist())
+    df[id_column]=df[id_column].astype(str)
+    st_id=df.loc[df[id_column]==id]
+    st_id=st_id.set_index(id_column)
+    numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    numerical_cols = st_id.select_dtypes(include=numerics)
+    st.markdown('### Hello {}'.format(id))
+    marks=numerical_cols
+    marks["Student_ID"]=id
+    mark=marks.melt(id_vars='Student_ID',var_name='Object',value_name='Scores')
+    sns.set(style='darkgrid', font_scale=2, rc={"figure.figsize": [14, 6]})
+    f, ax = plt.subplots(1, 1, figsize=(25, 10))
+    g = sns.lineplot(x='Object',y='Scores',data=mark, ax=ax)
+    ax.set_title('histogram of marks about second academy')
+    ax.set_ylabel('Students')
+    ax.set_xlabel('Marks')
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    st.pyplot()
+
+def to_excel(df):
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, sheet_name='Sheet1')
+    writer.save()
+    processed_data = output.getvalue()
+    return processed_data
+
+def get_table_download_link(df):
+    val = to_excel(df)
+    b64 = base64.b64encode(val)  # val looks like b'...'
+    return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="extract.xlsx">Download csv file</a>' # decode b'abc' => abc
+
    
 def transform(df,email_list):
   # SUMMARY
-    df_types = pd.DataFrame(df.dtypes, columns=['Data Type'])
-    numerical_cols = df_types[~df_types['Data Type'].isin(['object',
-                   'bool'])].index.values
-    df_types = pd.DataFrame(df.dtypes, columns=['Data Type'])
-    numerical_cols = df_types[~df_types['Data Type'].isin(['object',
-                   'bool'])].index.values
-    category_cols=df_types[~df_types['Data Type'].isin(['object',
-                   'bool'])].index.values
     index=st.sidebar.multiselect('Chosse index:',
                         df.columns.tolist())
-    index1=index[0]
+    index1=index[0]                 
     index2=index[1]
     index3=index[2]
-    email_list=email_list.set_index(index1)
     df=df.set_index([index1,index2,index3])
+
+    
+    numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    category=['object','bool']
+    df_types = pd.DataFrame(df.dtypes, columns=['Data Type'])
+
+    numerical_cols = df.select_dtypes(include=numerics)
+    category_cols=  df.select_dtypes(include=category)
+    email_list=email_list.set_index(index1)
     first_cols=st.sidebar.multiselect('First academic Object names',
-                        numerical_cols.tolist(),
-                        numerical_cols.tolist())
+                        numerical_cols.columns.tolist(),
+                        numerical_cols.columns.tolist())
     second_cols=st.sidebar.multiselect('Second academic Object names',
-                        df.columns.tolist(),
-                        df.columns.tolist())
+                        numerical_cols.columns.tolist(),
+                        numerical_cols.columns.tolist())
     _pass=st.sidebar.number_input('Enter mark to pass exam:', step=1)
     ds_df=df.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
     first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
@@ -126,23 +150,28 @@ def transform(df,email_list):
     st.pyplot()
     #warning list 1:
     year=st.sidebar.slider("Years", min_value=2014, max_value=2021, step=1)
-    warning_list1=[]
-
     fail_O1=first_fail.loc[(first_fail.Object=='OMAT')|(first_fail.Object=='OSTA')]
-    a=fail_O1[index1].values.tolist()
+    a=fail_O1[index1]
+    a=a.reset_index()
+    
 
     fail_O2=first_fail.loc[(first_fail.Object!='OMAT')|(first_fail.Object!='OSTA')]
     Id_count=fail_O2.groupby(fail_O2[index1]).Scores.count()
     list2=Id_count.loc[Id_count.values>=4]
-    b=list2.index.tolist()
-    warning_list1=a+b
-
+    b=pd.DataFrame(list2.index)
+    w_list1=pd.concat([a,b])
+    wlist1=pd.DataFrame(w_list1[index1])
+    wl1=wlist1.merge(df,how='left',on=index1)
+    warning_list1=wl1
     #Warning list 2:
     sub=['2015','2016','2017','2018']
     for i in sub:
       list2=first_fail.loc[first_fail[index2].str.contains(i)]
     
-    warning_list2=list2[index1].tolist()
+    c=list2[index1] #.tolist()
+    wlist2=pd.DataFrame(c)
+    wl2=wlist2.merge(df,how='left',on=index1)
+    warning_list2=wl2
     #List pass B
     _passB=ds_pass.loc[ds_pass.Object.str.contains('B')]
     count_passB=_passB.groupby([ds_pass[index1],ds_pass.Object]).count()
@@ -159,24 +188,17 @@ def transform(df,email_list):
     list_BSEM=[]
     BSEM=ds_pass.groupby(ds_pass[index1]).Object.count()
     BSEM_list=BSEM.loc[BSEM.values==18]
-    list_BSEM=BSEM_list.index.tolist()   
-    def sendmail(email_list):
-          email_sender=st.text_input('Enter User Email: ')
-          password=st.text_input('Enter User password: ',type='password')
-          email_reciever=""
-          _list=mail(email_list,warning_list1,warning_list2)
-          subject=st.text_input('Subject: ')
-          body=st.text_area('Context')
-          st.button('Send!')
-          for i in _list :
-            email_reciever=i
-            session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
-            session.starttls() #enable security
-            session.login(email_sender, password) #login with mail_id and password   
-            messages="Subject: {}\n\n{}".format(subject,body)  
-            session.sendmail(email_sender,email_reciever,messages)
-            session.quit()
-    sendmail(email_list)
+    list_BSEM=BSEM_list#.index.tolist()   
+    cho=st.selectbox('Chosse list',['Warning list 1','Warning list 2','BSEM list'])
+    if cho=='Warning list 1':
+      file=warning_list1
+    elif cho=='Warning list 2':
+      file=warning_list2
+    else:
+      file=list_BSEM
+    file
+    if st.button('Download here'):
+      get_table_download_link(file)
        
 def main():
     st.title('Student a dataset')
@@ -193,7 +215,9 @@ def main():
       if choose=='Operation Dashboard':
           transform(df,email_list)
       else:
-          st.write("")
+          st_id=st.sidebar.text_input('Enter Student ID:',"")
+          check_student(df,st_id)
+
 main()
 
 
