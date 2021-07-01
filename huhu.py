@@ -174,6 +174,7 @@ def transform(df,email_list):
     warning_list1=wl1
     #Warning list 2:
     sub=['2015','2016','2017','2018']
+    year
     for i in year:
       list2=first_fail.loc[first_fail[index2].str.contains(i)]
     list2
