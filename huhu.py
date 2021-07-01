@@ -49,9 +49,9 @@ def check_student(df,id):
     sns.set(style='darkgrid', font_scale=2, rc={"figure.figsize": [14, 6]})
     f, ax = plt.subplots(1, 1, figsize=(25, 10))
     g = sns.lineplot(x='Object',y='Scores',data=mark, ax=ax)
-    ax.set_title('histogram of marks about second academy')
-    ax.set_ylabel('Students')
-    ax.set_xlabel('Marks')
+    ax.set_title('histogram of marks about student')
+    ax.set_ylabel('Marks')
+    ax.set_xlabel('Object')
     st.set_option('deprecation.showPyplotGlobalUse', False)
     st.pyplot()
 
