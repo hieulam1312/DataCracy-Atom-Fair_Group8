@@ -49,9 +49,9 @@ def check_student(df,id):
     sns.set(style='darkgrid', font_scale=2, rc={"figure.figsize": [14, 6]})
     f, ax = plt.subplots(1, 1, figsize=(25, 10))
     g = sns.lineplot(x='Object',y='Scores',data=mark, ax=ax)
-    ax.set_title('histogram of marks about student')
-    ax.set_ylabel('Marks')
-    ax.set_xlabel('Object')
+    ax.set_title('PHÂN BỐ ĐIỂM CỦA SINH VIÊN THEO TỪNG MÔN')
+    ax.set_ylabel('ĐIỂM SỐ')
+    ax.set_xlabel('MÔN HỌC')
     st.set_option('deprecation.showPyplotGlobalUse', False)
     st.pyplot()
 
@@ -78,9 +78,10 @@ def download_link(object_to_download, download_filename, download_link_text):
 
 
 
-def transform(df,email_list):
+def transform(df):
   # SUMMARY
-    index=st.sidebar.multiselect('Chosse index:',
+    st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
+    index=st.sidebar.multiselect('Chọn thông tin cần xem báo cáo:',
                         df.columns.tolist())
     index1=index[0]                 
     index2=index[1]
@@ -91,14 +92,14 @@ def transform(df,email_list):
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     category=['object','bool']
     df_types = pd.DataFrame(df.dtypes, columns=['Data Type'])
-    _pass=st.sidebar.number_input('Enter mark to pass exam:', step=1)
+    _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
+    st.sidebar.markdown('B. ĐIỀU KIỆN ĐỂ TÌM DANH SÁCH SINH VIÊN')
     numerical_cols = df.select_dtypes(include=numerics)
     category_cols=  df.select_dtypes(include=category)
-    email_list=email_list.set_index(index1)
-    first_cols=st.sidebar.multiselect('First academic Object names',
+    first_cols=st.sidebar.multiselect('Các môn bắt buộc nhóm 1 / môn nền tảng năm nhất',
                         numerical_cols.columns.tolist(),
                         numerical_cols.columns.tolist())
-    second_cols=st.sidebar.multiselect('Second academic Object names',
+    second_cols=st.sidebar.multiselect('Các môn bắt buộc nhóm 2 / môn nền tảng năm 2',
                         numerical_cols.columns.tolist(),
                         numerical_cols.columns.tolist())
 
@@ -115,71 +116,77 @@ def transform(df,email_list):
     terminate=ds_terminate.groupby(ds_terminate[index2]).count()
     ds_doing=ds_df.loc[(ds_df[index3].isnull()==True)]
     doing=ds_doing.groupby(ds_doing[index2]).count()
-    doing['Terminate']=terminate['Scores']
-    doing['Doing']=doing['Scores']
-    doing['Ratio']=(doing['Terminate']/doing['Doing'])*100
-    a=doing[['Doing','Terminate','Ratio']]
+    doing['Đã thôi học']=terminate['Scores']
+    doing['Đang theo học']=doing['Scores']
+    doing['Phần trăm']=(doing['Đã thôi học']/doing['Đang theo học'])*100
+    a=doing[['Đang theo học','Đã thôi học','Phần trăm']]
     a=a.reset_index()
-    st.title('DATASET OF MARKS')
-    st.markdown("histogram of marks")
+    st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
+    st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
     st.set_option('deprecation.showPyplotGlobalUse', False)
     sns.set(style='darkgrid', font_scale=1.0, rc={"figure.figsize": [14, 6]})
     f, ax = plt.subplots(1, 1, figsize=(14, 6))
     g = sns.histplot(x=first_df.Scores, data=first_df, ax=ax)
-    ax.set_title('histogram of marks about first academy')
-    ax.set_ylabel('Students')
-    ax.set_xlabel('Marks')
+
+    ax.set_ylabel('Sinh viên')
+    ax.set_xlabel('Điểm số')
     st.pyplot()
 
     st.set_option('deprecation.showPyplotGlobalUse', False)
     sns.set(style='darkgrid', font_scale=1.0, rc={"figure.figsize": [14, 6]})
     f, ax = plt.subplots(1, 1, figsize=(14, 6))
     g = sns.histplot(x=second_df.Scores, data=second_df, ax=ax)
-    ax.set_title('histogram of marks about second academy')
-    ax.set_ylabel('Students')
-    ax.set_xlabel('Marks')
+    st.markdown('#### 2. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 2')
+    ax.set_ylabel('Sinh viên')
+    ax.set_xlabel('Điểm số')
     st.set_option('deprecation.showPyplotGlobalUse', False)
     st.pyplot()
 
-    st.markdown('### SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN NỀN TẢNG')
+    st.markdown('### 3. SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN NỀN TẢNG (NHÓM 1 & NHÓM 2')
     fig, ax = plt.subplots()
     sns.barplot(data=first_pass,x=first_pass[index2],y="Scores")
     st.pyplot()
     st.markdown("")
-    st.markdown("### SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN BẮT BUỘC")
+    st.markdown("### 4. SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN BẮT BUỘC")
     if len(_pass18)==0:
-      st.write("No one student in here")
+      st.write("Chưa có sinh viên nào hoàn thành tất cả các môn học")
     else:
       st.set_option('deprecation.showPyplotGlobalUse', False)
       sns.barplot(data=_pass18,x=_pass18[index2],y="Scores")
       st.pyplot()
     st.set_option('deprecation.showPyplotGlobalUse', False)
-    st.markdown('RATIO')
-    a.plot(x='Intake', y=['Terminate','Doing'], kind="bar")
+    st.markdown('### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
+    a.plot(x='Intake', y=['Đã thôi học','Đang theo học'], kind="bar")
     st.pyplot()
-    #warning list 1:
-    year=st.sidebar.multiselect('Enter year:',['2014','2015','2016','2017','2018','2019','2020','2021'])
-    fail_O1=first_fail.loc[(first_fail.Object=='OMAT')|(first_fail.Object=='OSTA')]
+    #warning list 1
+    
+    st.sidebar.markdown('C. TÌM SINH VIÊN RỚT NĂM 1')
+    need=st.sidebar.multiselect('Đậu các môn bắt buộc',                      
+                        numerical_cols.columns.tolist(),
+                        numerical_cols.columns.tolist())
+    total=st.sidebar.number_input('Hoặc đạt tổng số môn cần đạt:',step=1)
+    for i in need:
+
+      fail_O1=first_fail.loc[(first_fail.Object==i)]
+      fail_O2=first_fail.loc[(first_fail.Object!=i)]
+
     a=fail_O1[index1]
     a=a.reset_index()
-    
-
-    fail_O2=first_fail.loc[(first_fail.Object!='OMAT')|(first_fail.Object!='OSTA')]
     Id_count=fail_O2.groupby(fail_O2[index1]).Scores.count()
-    list2=Id_count.loc[Id_count.values>=4]
+    list2=Id_count.loc[Id_count.values >=total]
     b=pd.DataFrame(list2.index)
     w_list1=pd.concat([a,b])
     wlist1=pd.DataFrame(w_list1[index1])
     wl1=wlist1.merge(df,how='left',on=index1)
     warning_list1=wl1
+    st.sidebar.markdown('D. TÌM SINH VIÊN BỊ BUỘC THÔI HỌC')
+    year=st.sidebar.multiselect('Sinh viên thuộc nhóm rớt môn năm nhất và thuộc các niêm khóa:',['2014','2015','2016','2017','2018','2019','2020','2021'])
+
     #Warning list 2:
-    sub=['2015','2016','2017','2018']
-    year
     for i in year:
       list2=first_fail.loc[first_fail[index2].str.contains(i)]
       # list2
     c=list2[index1] #.tolist()
-    c
     wlist2=pd.DataFrame(c)
     wl2=wlist2.merge(df,how='left',on=index1)
     warning_list2=wl2
@@ -200,32 +207,32 @@ def transform(df,email_list):
     BSEM=ds_pass.groupby(ds_pass[index1]).Object.count()
     BSEM_list=BSEM.loc[BSEM.values==18]
     list_BSEM=BSEM_list#.index.tolist()   
-    cho=st.selectbox('Chosse list',['Warning list 1','Warning list 2','BSEM list'])
-    if cho=='Warning list 1':
+    st.markdown('### 6. DANH SÁCH SINH VIÊN THUỘC NHÓM CẢNH CÁO')
+    cho=st.selectbox('Vui lòng chọn',['DANH SÁCH SINH VIÊN CẦN ĐƯỢC CẢNH BÁO','DANH SÁCH SINH VIÊN BUỘC THÔI HỌC','BSEM list'])
+
+    if cho=='DANH SÁCH SINH VIÊN CẦN ĐƯỢC CẢNH BÁO':
       file=warning_list1
-    elif cho=='Warning list 2':
+    elif cho=='DANH SÁCH SINH VIÊN BUỘC THÔI HỌC':
       file=warning_list2
     else:
       file=list_BSEM
     file
-    if st.button('Download here'):
+    if st.button('Tải Danh sách tại đây'):
       tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
       st.markdown(tmp_download_link, unsafe_allow_html=True)
        
 def main():
     st.title('Student a dataset')
-    files = st.file_uploader("Upload file", type=['csv','xlsx','pickle'],accept_multiple_files=True)
+    files = st.file_uploader("Upload file", type=['csv','xlsx','pickle'],accept_multiple_files=False)
     if not files:
         st.write("Upload a .csv or .xlsx file to get started")
     else:
-      df = get_df(files[0])
-      email_list=get_df(files[1])
-      email_list=email_list.replace((0,np.nan))
+      df = get_df(files)
       data_df=df.replace((0,np.nan))
       data_df.columns=data_df.columns.str.replace(" ","_")
       choose=st.sidebar.selectbox('Enter your choose:',['Operation Dashboard','Student checking'])
       if choose=='Operation Dashboard':
-          transform(df,email_list)
+          transform(df)
       else:
           st_id=st.sidebar.text_input('Enter Student ID:',"")
           check_student(df,st_id)
