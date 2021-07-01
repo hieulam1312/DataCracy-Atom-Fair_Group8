@@ -177,8 +177,9 @@ def transform(df,email_list):
     year
     for i in year:
       list2=first_fail.loc[first_fail[index2].str.contains(i)]
-      list2
+      # list2
     c=list2[index1] #.tolist()
+    c
     wlist2=pd.DataFrame(c)
     wl2=wlist2.merge(df,how='left',on=index1)
     warning_list2=wl2
