@@ -8,7 +8,7 @@ seaborn
 gsheetsdb==0.1.13
 gspread
 secure-smtplib
-base64
+
 openpyxl==3.0.5
 matplotlib
 seaborn
