@@ -158,7 +158,7 @@ def transform(df,email_list):
     a.plot(x='Intake', y=['Terminate','Doing'], kind="bar")
     st.pyplot()
     #warning list 1:
-    year=st.sidebar.slider("Years", min_value=2014, max_value=2021, step=1)
+    year=st.sidebar.multiselect("Years", min_value=2014, max_value=2021, step=1)
     fail_O1=first_fail.loc[(first_fail.Object=='OMAT')|(first_fail.Object=='OSTA')]
     a=fail_O1[index1]
     a=a.reset_index()
