@@ -77,9 +77,7 @@ def download_link(object_to_download, download_filename, download_link_text):
     return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
 
 
-if st.button('Download input as a text file'):
-    tmp_download_link = download_link(s, 'YOUR_INPUT.txt', 'Click here to download your text!')
-    st.markdown(tmp_download_link, unsafe_allow_html=True)
+
 def transform(df,email_list):
   # SUMMARY
     index=st.sidebar.multiselect('Chosse index:',
