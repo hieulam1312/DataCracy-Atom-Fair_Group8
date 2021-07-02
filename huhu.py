@@ -22,6 +22,14 @@ import seaborn as sns
 pd.plotting.register_matplotlib_converters()
 import matplotlib.pyplot as plt
 from streamlit_pandas_profiling import st_profile_report
+from typing import Sized
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+import seaborn as sb
+# import pandas_profiling as pp
+from scipy.cluster.hierarchy import fcluster
+from sklearn.cluster import KMeans
 
 def get_df(file):
   # get extension and read file
@@ -56,18 +64,7 @@ def check_student(df,id):
     st.pyplot()
 
 def download_link(object_to_download, download_filename, download_link_text):
-    """
-    Generates a link to download the given object_to_download.
 
-    object_to_download (str, pd.DataFrame):  The object to be downloaded.
-    download_filename (str): filename and extension of file. e.g. mydata.csv, some_txt_output.txt
-    download_link_text (str): Text to display for download link.
-
-    Examples:
-    download_link(YOUR_DF, 'YOUR_DF.csv', 'Click here to download data!')
-    download_link(YOUR_STRING, 'YOUR_STRING.txt', 'Click here to download your text!')
-
-    """
     if isinstance(object_to_download,pd.DataFrame):
         object_to_download = object_to_download.to_csv(index=False)
 
@@ -76,8 +73,45 @@ def download_link(object_to_download, download_filename, download_link_text):
 
     return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
 
+def clustering(df):
+  numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+  numerical_cols = df.select_dtypes(include=numerics)
+  index=st.sidebar.selectbox('CHỌN TRƯỜNG THÔNG TIN ĐỂ PHẦN NHÓM',
+                          df.columns.tolist())              
+  df=df.set_index([index])
+  obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
+                          numerical_cols.columns.tolist(),
+                          numerical_cols.columns.tolist())
+  n_clus=st.sidebar.number_input('CHỌN SỐ LƯỢNG NHÓM',step=1)
+  perc =[.25, .50, .75,.90]
+# list of dtypes to include
+  include =[ 'float', 'int']
+  kmeans2 = KMeans(n_clusters=n_clus) #number of cluster = 4
+  list=[]
+  for i in obj:
+    list.append(i)
+  y = df.loc[:,list]
+  Y =y.reset_index()
+ 
+  desc =y.describe(percentiles = perc)
+  desc=desc.transpose()
+  st.markdown('PHÂN TÍCH TỔNG QUAN')
+  desc
+  Y["cluster"] = kmeans2.fit_predict(Y)
+  st.markdown('PHÂN NHÓM SINH VIÊN THEO PHƯƠNG PHÁP CLUSTERING')
+  agg = Y.groupby('cluster')[obj].mean().reset_index()
+  fin= agg
+  fin
+#   #Print student ID based on clustering 
+  for i in range(n_clus): 
 
+      df_tmp0 = Y.loc[Y.cluster == i] #Cluster level from 0 to 3
 
+      st.markdown('Danh sách sinh viên thuộc nhóm {}'.format(i+1))
+      student_id0=df_tmp0
+      df_tmp0
+      tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Click here to download your data!')
+      st.markdown(tmp_download_link, unsafe_allow_html=True)
 def transform(df):
   # SUMMARY
     st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
@@ -87,7 +121,7 @@ def transform(df):
     index2=index[1]
     index3=index[2]
     df=df.set_index([index1,index2,index3])
-
+    
     
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     category=['object','bool']
@@ -102,8 +136,15 @@ def transform(df):
     second_cols=st.sidebar.multiselect('Các môn bắt buộc nhóm 2 / môn nền tảng năm 2',
                         numerical_cols.columns.tolist(),
                         numerical_cols.columns.tolist())
-    num=st.sidebar.number_input('Tổng số môn học bắt buộc:',step=1)
-    ds_df=df.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
+    num=st.sidebar.number_input('Tổng số môn học nền tảng bắt buộc:',step=1)
+    # major=(category_cols.reset_index().columns.tolist())
+    # # -index
+    # m=[m for m in major if m not in index]
+    # list_major=category_colsunique()
+    # list_major
+
+    number=numerical_cols.reset_index()
+    ds_df=number.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
     first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
     second_df=df[second_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
     first_pass=first_df.loc[first_df.Scores>=_pass]
@@ -238,12 +279,15 @@ def main():
       df = get_df(files)
       data_df=df.replace((0,np.nan))
       data_df.columns=data_df.columns.str.replace(" ","_")
-      choose=st.sidebar.selectbox('Enter your choose:',['Operation Dashboard','Student checking'])
+      choose=st.sidebar.selectbox('Enter your choose:',['Operation Dashboard','Student checking','Phân nhóm học tập'])
       if choose=='Operation Dashboard':
           transform(df)
-      else:
+      elif choose=='Student checking':
           st_id=st.sidebar.text_input('Enter Student ID:',"")
           check_student(df,st_id)
+      elif choose == 'Phân nhóm học tập':
+          clustering(df)
+
 
 main()
 
