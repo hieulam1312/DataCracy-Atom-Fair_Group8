@@ -15,3 +15,4 @@ seaborn
 xlsxwriter
 gspread
 streamlit-pandas-profiling==0.1.2
+sklearn
