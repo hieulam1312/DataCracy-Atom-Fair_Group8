@@ -258,7 +258,7 @@ def transform(df):
       #warning list 1
       
       st.sidebar.markdown('C. TÌM SINH VIÊN RỚT NĂM 1')
-      need=st.sidebar.multiselect('Đậu các môn bắt buộc',                      ,
+      need=st.sidebar.multiselect('Đậu các môn bắt buộc',                      
                           numerical_cols.columns.tolist())
       total=st.sidebar.number_input('Hoặc đạt tổng số môn cần đạt:',step=1)
       for i in need:
