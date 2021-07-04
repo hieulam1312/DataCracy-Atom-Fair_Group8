@@ -40,7 +40,7 @@ def get_df(file):
   elif extension.upper() == 'PICKLE':
     df = pd.read_pickle(file)
   return df.replace((" ",np.nan))
-@st.cache
+
 def check_student(df,id):
 
     id_column=st.sidebar.multiselect('Chọn trường chứa mã sinh viên và họ tên:',
@@ -309,7 +309,6 @@ def transform(df):
         tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-@st.cache(suppress_st_warning=True)   
 def main():
 
 
