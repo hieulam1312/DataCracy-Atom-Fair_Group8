@@ -5,7 +5,8 @@ from datetime import datetime as dt #-> Để xử lý data dạng datetime
 import base64
 from io import BytesIO
 import numpy as np
-import pandas as pd #-> Để update data dạng bản
+import pandas as pd
+from streamlit.proto.RootContainer_pb2 import SIDEBAR #-> Để update data dạng bản
 pd.plotting.register_matplotlib_converters()
 import matplotlib.image as mpimg
 
@@ -97,18 +98,18 @@ def clustering(df):
     index=st.sidebar.selectbox('CHỌN TRƯỜNG THÔNG TIN ĐỂ PHẦN NHÓM',
                             df.columns.tolist())     
     if not index:
-      st.error('Please enter variable at sidebar')       
+      st.error('Vui lòng bổ sung trường thông tin tại sidebar')       
     else:  
       df=df.set_index([index]) 
       obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
                               numerical_cols.columns.tolist(),
                               numerical_cols.columns.tolist())
       if not obj:
-        st.sidebar.error('Please enter variable at sidebar')       
+        st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')       
       else:
         n_clus=st.sidebar.number_input('CHỌN SỐ LƯỢNG NHÓM',step=1)
         if not n_clus:
-          st.sidebar.error('Please enter variable at sidebar')       
+          st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')       
         else:
           perc =[.25, .50, .75,.90]
         # list of dtypes to include
@@ -140,29 +141,9 @@ def clustering(df):
               tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Click here to download your data!')
               st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-def transform(df,index):
-    index1=0
-    index2=0
-    index3=0
-    if not index:
-      st.error('Vui lòng chọn trường thông tin tại sidebar')
-    else:
-      index1=index[0]                 
-      index2=index[1]
-      index3=index[2]
-      df=df.set_index([index1,index2,index3]) 
-      numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-      _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
-      st.sidebar.markdown('B. ĐIỀU KIỆN ĐỂ TÌM DANH SÁCH SINH VIÊN')
-      numerical_cols = df.select_dtypes(include=numerics)
-      first_cols=st.sidebar.multiselect('Các môn bắt buộc nhóm 1 / môn nền tảng năm nhất',
-                          numerical_cols.columns.tolist())
-      second_cols=st.sidebar.multiselect('Các môn bắt buộc nhóm 2 / môn nền tảng năm 2',
-                          numerical_cols.columns.tolist())
-      number=numerical_cols.reset_index()
+def transform(df,numerical_cols,first_cols,second_cols):
       st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
       st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
-
       a=df[first_cols]
       ii=a.columns.tolist()
       x=round(len(ii)/2)
@@ -194,22 +175,29 @@ def transform(df,index):
       plt.show()
       st.pyplot(fig2)
 
+
+
+def abc(df,index1,index2,index3,numerical_cols,number,first_cols,_pass):
+      st.sidebar.markdown('B. ĐIỀU KIỆN ĐỂ TÌM DANH SÁCH SINH VIÊN')   
       ds_df=number.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
-      first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
-      first_pass=first_df.loc[first_df.Scores>=_pass]
-      first_fail=first_df.loc[(first_df.Scores<_pass)]
-      ds_pass=ds_df.loc[ds_df.Scores>=_pass]
       st.markdown('### 3. SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN NỀN TẢNG (NHÓM 1 & NHÓM 2')
       fig, ax = plt.subplots()
+      first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
+      first_pass=first_df.loc[first_df.Scores>=_pass]
       sns.barplot(data=first_pass,x=first_pass[index2],y="Scores")
-      st.pyplot()
+      st.pyplot(fig)
       st.markdown("")
       st.markdown("### 4. SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN BẮT BUỘC")
       num=st.sidebar.number_input('Tổng số môn học nền tảng bắt buộc:',step=1)
-      l=ds_pass.groupby([ds_pass[index1],ds_pass[index2]]).count()
-      l=l.reset_index()
-      _pass18=l.loc[l.Scores>=num]
-      pass18=_pass18.groupby(_pass18[index2]).count()
+      if not num:
+        st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')
+      else:
+          
+        ds_pass=ds_df.loc[ds_df.Scores>=_pass]
+        l=ds_pass.groupby([ds_pass[index1],ds_pass[index2]]).count()
+        l=l.reset_index()
+        _pass18=l.loc[l.Scores>=num]
+        pass18=_pass18.groupby(_pass18[index2]).count()
       pass18= pass18.reset_index()
       if len(pass18)==0:
         st.write("Chưa có sinh viên nào hoàn thành tất cả các môn học")
@@ -218,7 +206,6 @@ def transform(df,index):
         sns.barplot(data=pass18,x=index2,y=index1)
         st.pyplot()
       st.set_option('deprecation.showPyplotGlobalUse', False)
-
 
       ds_terminate=ds_df.loc[(ds_df[index3].isnull()==False)] 
       terminate=ds_terminate.groupby(ds_terminate[index2]).count()
@@ -234,36 +221,50 @@ def transform(df,index):
       a.plot(x=index2, y=['Đã thôi học','Đang theo học'], kind="bar")
       st.pyplot()
       #warning list 1
-      
+def out(df,index1,index2,index3,numerical_cols,first_cols,_pass):
+
       st.sidebar.markdown('C. TÌM SINH VIÊN RỚT NĂM 1')
       need=st.sidebar.multiselect('Đậu các môn bắt buộc',                      
                           numerical_cols.columns.tolist())
-      total=st.sidebar.number_input('Hoặc đạt tổng số môn cần đạt:',step=1)
-      for i in need:
+      if not need:
+        st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')
+      else:
+        total=st.sidebar.number_input('Hoặc đạt tổng số môn cần đạt:',step=1)
+        if not total:
+          st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')
+        else:
+          first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
+        first_fail=first_df.loc[(first_df.Scores<_pass)].reset_index()
 
-        fail_O1=first_fail.loc[(first_fail.Object==i)]
-        fail_O2=first_fail.loc[(first_fail.Object!=i)]
+        fail_O1=df
+        fail_O2=df
 
-      a=fail_O1[index1]
-      a=a.reset_index()
-      Id_count=fail_O2.groupby(fail_O2[index1]).Scores.count()
-      list2=Id_count.loc[Id_count.values >=total]
-      b=pd.DataFrame(list2.index)
-      w_list1=pd.concat([a,b])
-      wlist1=pd.DataFrame(w_list1[index1])
-      wl1=wlist1.merge(df,how='left',on=index1)
-      warning_list1=wl1
+        for i in need:
+
+          fail_O1=first_fail.loc[(first_fail.Object==i)]
+          fail_O2=first_fail.loc[(first_fail.Object!=i)]
+        a=fail_O1[index1]
+        a=a.reset_index()
+        Id_count=fail_O2.groupby(fail_O2[index1]).Scores.count()
+        list2=Id_count.loc[Id_count.values >=total]
+        b=pd.DataFrame(list2.index)
+        w_list1=pd.concat([a,b])
+        wlist1=pd.DataFrame(w_list1[index1])
+        wl1=wlist1.merge(df,how='left',on=index1)
+        warning_list1=wl1
+
 
       st.sidebar.markdown('D. TÌM SINH VIÊN BỊ BUỘC THÔI HỌC')
       year=st.sidebar.multiselect('Sinh viên thuộc nhóm rớt môn năm nhất và thuộc các niêm khóa:',['2014','2015','2016','2017','2018','2019','2020','2021'])
-
+      if not year:
+        st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')
+      else:
       #Warning list 2:
-      for i in year:
-        list2=first_fail.loc[first_fail[index2].str.contains(i)]
-        list2
-      c=list2[index1] #.tolist()
-      wlist2=pd.DataFrame(c)
-      wl2=wlist2.merge(df,how='left',on=index1)
+        for i in year:
+          list2=first_fail.loc[first_fail[index2].str.contains(i)]
+        c=list2[index1] #.tolist()
+        wlist2=pd.DataFrame(c)
+        wl2=wlist2.merge(df,how='left',on=index1)
       warning_list2=wl2
     
 
@@ -285,7 +286,7 @@ def main():
 
 
     st.markdown("<p style='text-align: center;'><strong><span style='font-size: 28px; font-family: Arial, Helvetica, sans-serif;color:orange'>ỨNG DỤNG</span></strong></p><p style='text-align: center;'><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 28px;color: orange'><strong>HỖ TRỢ QUẢN L&Yacute; TRONG GI&Aacute;O DỤC</strong></span></span></p>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: right;'><strong><em><span style='font-size: 12px;'>Tạo bởi: Atom Fair - Nhóm 8 (</span></em></strong><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Lâm Hiếu -&nbsp;</strong></em></span></span><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Toàn Trần</strong></em></span></span><strong><em><span style='font-size: 12px; font-family: Arial, Helvetica, sans-serif;'>- Hạnh Nguyễn)</span></em></strong></p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: right;'><strong><em><span style='font-size: 12px;'>Tạo bởi: Atom Fair - Nhóm 8 (</span></em></strong><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Lâm Hiếu -&nbsp;</strong></em></span></span><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Toàn Trần;</strong></em></span></span><strong><em><span style='font-size: 12px; font-family: Arial, Helvetica, sans-serif;'>- Hạnh Nguyễn)</span></em></strong></p>", unsafe_allow_html=True)
     files = st.file_uploader("Upload file", type=['csv','xlsx','pickle'],accept_multiple_files=False)
     
     if not files:
@@ -300,14 +301,32 @@ def main():
           st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
           index=st.sidebar.multiselect('Chọn thông tin cần xem báo cáo:',
                           df.columns.tolist())
-          transform(df,index)
+          index1=0
+          index2=0
+          index3=0
+          index1=index[0]                 
+          index2=index[1]
+          index3=index[2]
+          df=df.set_index([index1,index2,index3]) 
+          numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+          numerical_cols = df.select_dtypes(include=numerics)
+          number=numerical_cols.reset_index()  
+          first_cols=st.sidebar.multiselect('Chọn tất cả các môn năm nhất để xem phổ điểm',
+                      numerical_cols.columns.tolist())
+          second_cols=st.sidebar.multiselect('Chọn tất cả các môn năm 2 để xem phổ điểm',
+                      numerical_cols.columns.tolist())
+          transform(df,numerical_cols,first_cols,second_cols)
+          _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
 
+          abc(df,index1,index2,index3,numerical_cols,number,first_cols,_pass)
+          out(df,index1,index2,index3,numerical_cols,first_cols,_pass)
       elif choose=='Student checking':
           st_id=st.sidebar.text_input('Nhập mã sinh viên:',"")
           if not st_id:
             st.sidebar.error('Vui lòng nhập mã số sinh viên')
           else:
            check_student(df,st_id)
+           
       elif choose == 'Phân nhóm học tập':
           clustering(df)
 
