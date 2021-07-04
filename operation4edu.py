@@ -8,8 +8,7 @@ import numpy as np
 import pandas as pd #-> Để update data dạng bản
 pd.plotting.register_matplotlib_converters()
 import matplotlib.image as mpimg
-from google.oauth2 import service_account
-from gsheetsdb import connect
+
 from datetime import datetime, timedelta
 from datetime import datetime as dt
 from typing import Text
@@ -43,7 +42,7 @@ def get_df(file):
   return df.replace((" ",np.nan))
 
 def check_student(df,id):
-  try:
+
     id_column=st.sidebar.multiselect('Chọn trường chứa mã sinh viên và họ tên:',
                         df.columns.tolist())
     df[id_column]=df[id_column].astype('str')
@@ -80,8 +79,7 @@ def check_student(df,id):
       ax.set_xlabel('MÔN HỌC')
       st.set_option('deprecation.showPyplotGlobalUse', False)
       st.pyplot()
-  except ValueError:
-    st.sidebar.error('please select variable at sidebar')
+
 def download_link(object_to_download, download_filename, download_link_text):
 
     if isinstance(object_to_download,pd.DataFrame):
@@ -93,7 +91,7 @@ def download_link(object_to_download, download_filename, download_link_text):
     return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
 
 def clustering(df):
-  try:
+
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     numerical_cols = df.select_dtypes(include=numerics)
     index=st.sidebar.selectbox('CHỌN TRƯỜNG THÔNG TIN ĐỂ PHẦN NHÓM',
@@ -141,11 +139,10 @@ def clustering(df):
               df_tmp0
               tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Click here to download your data!')
               st.markdown(tmp_download_link, unsafe_allow_html=True)
-  except ValueError:
-    st.error('please select variable at sidebar')
+
 
 def transform(df):
-  try:
+
   # SUMMARY
     st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
     index=st.sidebar.multiselect('Chọn thông tin cần xem báo cáo:',
@@ -185,6 +182,7 @@ def transform(df):
       number=numerical_cols.reset_index()
       ds_df=number.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
       first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
+
       second_df=df[second_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
       first_pass=first_df.loc[first_df.Scores>=_pass]
       first_fail=first_df.loc[(first_df.Scores<_pass)]
@@ -206,29 +204,42 @@ def transform(df):
       st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
       st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
 
-      st.set_option('deprecation.showPyplotGlobalUse', False)
-      hu=sns.FacetGrid(first_df,row=index2,col='Object')
-      hu.map(sns.histplot,'Scores')
-      sns.set(style='darkgrid', font_scale=1.0, rc={"figure.figsize": [60,20]})
+      # st.set_option('deprecation.showPyplotGlobalUse', False)
+      # hu=sns.FacetGrid(first_df,row=index2,col='Object')
+      # hu.map(sns.histplot,'Scores')
+      # sns.set(style='darkgrid', font_scale=1.0, rc={"figure.figsize": [60,20]})
     
 
+      a=df[first_cols]
+      ii=a.columns.tolist()
+      x=round(len(ii)/2)
+      y=2
+      c = 1  # initialize plot counter
+      fig = plt.figure(figsize=(20,15))
+      for i in ii:
+          plt.subplot(x, y, c)
+          plt.title('{}, subplot: {}{}{}'.format(i, x, y, c))
+          plt.xlabel(i)
+          sns.countplot(df[i])
+          c = c + 1
 
-
-      # f, ax = plt.subplots(1, 1, figsize=(14, 6))
-      # g = sns.histplot(x=first_df.Scores, data=first_df, ax=ax)
-      # ax.set_ylabel('Sinh viên')
-      # ax.set_xlabel('Điểm số')
-      st.pyplot()
-
-      st.set_option('deprecation.showPyplotGlobalUse', False)
-      sns.set(style='darkgrid', font_scale=1.0, rc={"figure.figsize": [14, 6]})
-      f, ax = plt.subplots(1, 1, figsize=(14, 6))
-      g = sns.histplot(x=second_df.Scores, data=second_df, ax=ax)
-      st.markdown('#### 2. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 2')
-      ax.set_ylabel('Sinh viên')
-      ax.set_xlabel('Điểm số')
-      st.set_option('deprecation.showPyplotGlobalUse', False)
-      st.pyplot()
+      plt.show()
+      st.pyplot(fig)
+      st.markdown("#### 2. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 2")
+      h=df[second_cols]
+      iii=h.columns.tolist()
+      d=round(len(iii)/2)
+      e=2
+      f= 1  # initialize plot counter
+      fig2 = plt.figure(figsize=(25,30  ))
+      for z in iii:
+          plt.subplot(d, e, f)
+          plt.title('{}, subplot: {}{}{}'.format(z, d, e, f))
+          plt.xlabel(z)
+          sns.countplot(df[z])
+          f = f + 1
+      plt.show()
+      st.pyplot(fig2)
 
       st.markdown('### 3. SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN NỀN TẢNG (NHÓM 1 & NHÓM 2')
       fig, ax = plt.subplots()
@@ -301,11 +312,10 @@ def transform(df):
       if st.button('Tải Danh sách tại đây'):
         tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
-  except ValueError:
-    st.error('please select variable at sidebar')     
+
       
 def main():
-  try:
+
 
     st.markdown("<p style='text-align: center;'><strong><span style='font-size: 28px; font-family: Arial, Helvetica, sans-serif;color:orange'>ỨNG DỤNG</span></strong></p><p style='text-align: center;'><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 28px;color: orange'><strong>HỖ TRỢ QUẢN L&Yacute; TRONG GI&Aacute;O DỤC</strong></span></span></p>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: right;'><strong><em><span style='font-size: 12px;'>Tạo bởi: Atom Fair - Nhóm 8 (</span></em></strong><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Lâm Hiếu -&nbsp;</strong></em></span></span><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Toàn Trần;</strong></em></span></span><strong><em><span style='font-size: 12px; font-family: Arial, Helvetica, sans-serif;'>- Hạnh Nguyễn)</span></em></strong></p>", unsafe_allow_html=True)
@@ -328,8 +338,6 @@ def main():
            check_student(df,st_id)
       elif choose == 'Phân nhóm học tập':
           clustering(df)
-  except ValueError:
-        st.error('please select variable at sidebar')
 
 
 main()
