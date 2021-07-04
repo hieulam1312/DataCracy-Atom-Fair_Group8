@@ -161,10 +161,10 @@ def clustering(df):
     print(Y)
     kmeans.fit(Y)
     Y["cluster"] = kmeans.labels_
-    sb.pairplot(data=Y,hue="cluster")
+    sb.pairplot(data=Y,hue="cluster",height=10)
     st.pyplot()
     sb.relplot(
-        x="OMAT", y="OSTA", hue="cluster", data=Y, height=20,)
+        x="OMAT", y="OSTA", hue="cluster", data=Y, height=10)
     st.pyplot()
     
     Y["cluster"] = kmeans2.fit_predict(Y)
