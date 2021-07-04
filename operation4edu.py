@@ -181,7 +181,7 @@ def clustering(df):
           tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Bấm vào đây để tải file!')
           st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-  def transform(df,numerical_cols,first_cols,second_cols):
+ def transform(df,numerical_cols,first_cols,second_cols):
         st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
         st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
         a=df[first_cols]
