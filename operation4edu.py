@@ -167,10 +167,8 @@ def transform(df):
       numerical_cols = df.select_dtypes(include=numerics)
       category_cols=  df.select_dtypes(include=category)
       first_cols=st.sidebar.multiselect('Các môn bắt buộc nhóm 1 / môn nền tảng năm nhất',
-                          numerical_cols.columns.tolist(),
                           numerical_cols.columns.tolist())
       second_cols=st.sidebar.multiselect('Các môn bắt buộc nhóm 2 / môn nền tảng năm 2',
-                          numerical_cols.columns.tolist(),
                           numerical_cols.columns.tolist())
       num=st.sidebar.number_input('Tổng số môn học nền tảng bắt buộc:',step=1)
       # major=(category_cols.reset_index().columns.tolist())
@@ -260,8 +258,7 @@ def transform(df):
       #warning list 1
       
       st.sidebar.markdown('C. TÌM SINH VIÊN RỚT NĂM 1')
-      need=st.sidebar.multiselect('Đậu các môn bắt buộc',                      
-                          numerical_cols.columns.tolist(),
+      need=st.sidebar.multiselect('Đậu các môn bắt buộc',                      ,
                           numerical_cols.columns.tolist())
       total=st.sidebar.number_input('Hoặc đạt tổng số môn cần đạt:',step=1)
       for i in need:
