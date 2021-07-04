@@ -180,8 +180,7 @@ def clustering(df):
           df_tmp0
           tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Bấm vào đây để tải file!')
           st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-def transform(df,numerical_cols,first_cols,second_cols):
+def transform(df,first_cols,second_cols):
         st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
         st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
         a=df[first_cols]
@@ -355,7 +354,7 @@ def main():
                       numerical_cols.columns.tolist())
           second_cols=st.sidebar.multiselect('Chọn tất cả các môn năm 2 để xem phổ điểm',
                       numerical_cols.columns.tolist())
-          transform(df,numerical_cols,first_cols,second_cols)
+          transform(df,first_cols,second_cols)
           _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
 
           abc(df,index1,index2,index3,numerical_cols,number,first_cols,_pass)
