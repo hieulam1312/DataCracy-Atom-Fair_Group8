@@ -1,3 +1,4 @@
+from types import new_class
 import streamlit as st
 import smtplib
 import re #-> Để xử lý data dạng string
@@ -92,88 +93,127 @@ def download_link(object_to_download, download_filename, download_link_text):
     return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
 
 def clustering(df):
-
-    numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-    numerical_cols = df.select_dtypes(include=numerics)
-    index=st.sidebar.selectbox('CHỌN TRƯỜNG THÔNG TIN ĐỂ PHẦN NHÓM',
-                            df.columns.tolist())     
-    if not index:
-      st.error('Vui lòng bổ sung trường thông tin tại sidebar')       
-    else:  
-      df=df.set_index([index]) 
-      obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
-                              numerical_cols.columns.tolist(),
-                              numerical_cols.columns.tolist())
-      if not obj:
-        st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')       
-      else:
-        n_clus=st.sidebar.number_input('CHỌN SỐ LƯỢNG NHÓM',step=1)
-        if not n_clus:
-          st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')       
-        else:
-          perc =[.25, .50, .75,.90]
-        # list of dtypes to include
-          include =[ 'float', 'int']
-          kmeans2 = KMeans(n_clusters=n_clus) #number of cluster = 4
-          list=[]
-          for i in obj:
-            list.append(i)
-          y = df.loc[:,list]
-          Y =y.reset_index()
+  numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+  numerical_cols = df.select_dtypes(include=numerics)
+  index=st.sidebar.selectbox('CHỌN TRƯỜNG CHỨA MÃ SỐ SINH VIÊN',
+                          df.columns.tolist())     
+  if not index:
+    st.error('Vui lòng bổ sung trường thông tin tại sidebar')       
+  else:  
+    df=df.set_index([index]) 
+    obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
+                            numerical_cols.columns.tolist(),
+                            numerical_cols.columns.tolist())
     
-          desc =y.describe(percentiles = perc)
-          desc=desc.transpose()
-          st.markdown('PHÂN TÍCH TỔNG QUAN')
-          desc
-          Y["cluster"] = kmeans2.fit_predict(Y)
-          st.markdown('PHÂN NHÓM SINH VIÊN THEO PHƯƠNG PHÁP CLUSTERING')
-          agg = Y.groupby('cluster')[obj].mean().reset_index()
-          fin= agg
-          fin
-      #   #Print student ID based on clustering 
-          for i in range(n_clus): 
+    kmeans2 = KMeans(n_clusters=4) #number of cluster = 4
+    list=[]
+    for i in obj:
+      list.append(i)
+    y = df.loc[:,list]
+    Y =y.reset_index()
+    Y["cluster"] = kmeans2.fit_predict(Y)
+    Y["cluster"] = Y["cluster"].astype("category")
 
-              df_tmp0 = Y.loc[Y.cluster == i] #Cluster level from 0 to 3
+    Y["cluster"] = kmeans2.labels_
+    desc =Y.describe()
+    
+    st.markdown('PHÂN TÍCH TỔNG QUAN')
+    desc
+    st.markdown("")
+    # Silhouette Coefficient to find optimal cluster
+    from sklearn.metrics import silhouette_score
+    silhouette_coefficients = []
+    kmeans_kwargs = {
+        "init": "random",
+        "n_init": 10,
+        "max_iter": 300,
+        "random_state": 42,
+    }
+    clus_dict = {} #contain number of cluster and silhouette coef
+    #Start at 2 clusters
+    for k in range(2, 11):
+        kmeans = KMeans(n_clusters=k, **kmeans_kwargs)
+        kmeans.fit(Y)
+        score = silhouette_score(Y, kmeans.labels_)
+        silhouette_coefficients.append(score)
+        clus_dict[k] = score
+    st.markdown('TÌM SỐ NHÓM TỐI ƯU THEO PHƯƠNG PHÁP SILHOUETTE')
+    #Draw chart to visualize clusters
+    fig=plt.figure(figsize = (10,5))
+    plt.plot(range(2,11), silhouette_coefficients)
+    plt.xticks(range(2,11))
+    plt.xlabel("Number of clusters")
+    plt.ylabel("Silhouette Coefficient")
+    plt.show()
+    st.pyplot(fig)
+    #Print and draw chart with optimal number of clusters
+    max_value = max(clus_dict, key=clus_dict.get)
+    st.markdown('Số nhóm tối ưu có thể chia là: ' + str(max_value))
+    st.markdown("")
 
-              st.markdown('Danh sách sinh viên thuộc nhóm {}'.format(i+1))
-              student_id0=df_tmp0
-              df_tmp0
-              tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Click here to download your data!')
-              st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-def transform(df,numerical_cols,first_cols,second_cols):
-      st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
-      st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
-      a=df[first_cols]
-      ii=a.columns.tolist()
-      x=round(len(ii)/2)
-      y=2
-      c = 1  # initialize plot counter
-      fig = plt.figure(figsize=(20,15))
-      for i in ii:
-          plt.subplot(x, y, c)
-          plt.title('{}, subplot: {}{}{}'.format(i, x, y, c))
-          plt.xlabel(i)
-          sns.countplot(df[i])
-          c = c + 1
+    st.markdown('KẾT QUẢ PHÂN NHÓM VỚI CỤM TỐI ƯU')
+    st.markdown("")
+    kmeans = KMeans(n_clusters=max_value) #number of cluster = max value
+    n_clus=max_value
+    Y["cluster"] = kmeans.fit_predict(Y)
+    Y["cluster"] = Y["cluster"].astype("category")
+    print(Y)
+    kmeans.fit(Y)
+    Y["cluster"] = kmeans.labels_
+    sb.pairplot(data=Y,hue="cluster")
+    st.pyplot()
+    sb.relplot(
+        x="OMAT", y="OSTA", hue="cluster", data=Y, height=4,)
+    st.pyplot()
+    
+    Y["cluster"] = kmeans2.fit_predict(Y)
 
-      plt.show()
-      st.pyplot(fig)
-      st.markdown("#### 2. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 2")
-      h=df[second_cols]
-      iii=h.columns.tolist()
-      d=round(len(iii)/2)
-      e=2
-      f= 1  # initialize plot counter
-      fig2 = plt.figure(figsize=(25,30  ))
-      for z in iii:
-          plt.subplot(d, e, f)
-          plt.title('{}, subplot: {}{}{}'.format(z, d, e, f))
-          plt.xlabel(z)
-          sns.countplot(df[z])
-          f = f + 1
-      plt.show()
-      st.pyplot(fig2)
+    if st.button('LẤY DANH SÁCH KẾT QUẢ'):
+  #   #Print student ID based on clustering 
+      for i in range(n_clus): 
+
+          df_tmp0 = Y.loc[Y.cluster == i] #Cluster level from 0 to 3
+
+          st.markdown('Danh sách sinh viên thuộc nhóm {}'.format(i+1))
+          student_id0=df_tmp0
+          df_tmp0
+          tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Bấm vào đây để tải file!')
+          st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+  def transform(df,numerical_cols,first_cols,second_cols):
+        st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
+        st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
+        a=df[first_cols]
+        ii=a.columns.tolist()
+        x=round(len(ii)/2)
+        y=2
+        c = 1  # initialize plot counter
+        fig = plt.figure(figsize=(20,15))
+        for i in ii:
+            plt.subplot(x, y, c)
+            plt.title('{}, subplot: {}{}{}'.format(i, x, y, c))
+            plt.xlabel(i)
+            sns.countplot(df[i])
+            c = c + 1
+
+        plt.show()
+        st.pyplot(fig)
+        st.markdown("#### 2. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 2")
+        h=df[second_cols]
+        iii=h.columns.tolist()
+        d=round(len(iii)/2)
+        e=2
+        f= 1  # initialize plot counter
+        fig2 = plt.figure(figsize=(25,30  ))
+        for z in iii:
+            plt.subplot(d, e, f)
+            plt.title('{}, subplot: {}{}{}'.format(z, d, e, f))
+            plt.xlabel(z)
+            sns.countplot(df[z])
+            f = f + 1
+        plt.show()
+        st.pyplot(fig2)
 
 
 
