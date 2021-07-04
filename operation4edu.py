@@ -140,7 +140,7 @@ def clustering(df):
               tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Click here to download your data!')
               st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-@st.cache
+@st.cache(suppress_st_warning=True)
 def transform(df):
 
   # SUMMARY
