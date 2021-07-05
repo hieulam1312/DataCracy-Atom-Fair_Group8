@@ -178,9 +178,11 @@ def clustering(df):
     Y["cluster"] = kmeans.labels_
     sb.pairplot(data=Y,hue="cluster",height=5)
     st.pyplot()
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+
     sb.relplot(
         x="OMAT", y="OSTA", hue="cluster", data=Y, height=5)
-    st.pyplot(fig)
+    st.pyplot()
     
     Y["cluster"] = kmeans2.fit_predict(Y)
 
