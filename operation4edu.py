@@ -120,6 +120,20 @@ def clustering(df):
     st.markdown('PHÂN TÍCH TỔNG QUAN')
     desc
     st.markdown("")
+    st.markdown('PHỔ ĐIỂM TRUNG BÌNH')
+    mean_df = df.iloc[:,3:25] #Create a temporary df to calculate mean values
+# print(mean_df)
+    row = df.iloc[0,3:25] # clus_df.iloc[clus_df["Student ID"] = x,3:25]
+    # Plot a chart with selected row, can be replaced value 0 with input student ID
+    values = list(row) #create a list contains grades
+    plt.figure(figsize = (15,6))
+    ax = row.plot(kind='bar', label='Grade')
+    mean_df.mean().plot(ax=ax, color='r', linestyle='-', label='Mean')
+    ax.legend()
+    plt.xlabel("Grade per subject")
+    plt.show()
+    st.pyplot()
+
     # Silhouette Coefficient to find optimal cluster
     from sklearn.metrics import silhouette_score
     silhouette_coefficients = []
@@ -180,6 +194,7 @@ def clustering(df):
           df_tmp0
           tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Bấm vào đây để tải file!')
           st.markdown(tmp_download_link, unsafe_allow_html=True)
+
 def transform(df,first_cols,second_cols):
         st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
         st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
