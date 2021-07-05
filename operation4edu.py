@@ -106,10 +106,10 @@ def clustering(df):
                             numerical_cols.columns.tolist())
     
     kmeans2 = KMeans(n_clusters=4) #number of cluster = 4
-    list=[]
+    _list=[]
     for i in obj:
-      list.append(i)
-    y = df.loc[:,list]
+      _list.append(i)
+    y = df.loc[:,_list]
     Y =y.reset_index()
     Y["cluster"] = kmeans2.fit_predict(Y)
     Y["cluster"] = Y["cluster"].astype("category")
@@ -130,6 +130,7 @@ def clustering(df):
     ax = row.plot(kind='bar', label='Grade')
     mean_df.mean().plot(ax=ax, color='r', linestyle='-', label='Mean')
     ax.legend()
+    st.set_option('deprecation.showPyplotGlobalUse', False)
     plt.xlabel("Grade per subject")
     plt.show()
     st.pyplot()
@@ -179,7 +180,7 @@ def clustering(df):
     st.pyplot()
     sb.relplot(
         x="OMAT", y="OSTA", hue="cluster", data=Y, height=5)
-    st.pyplot()
+    st.pyplot(fig)
     
     Y["cluster"] = kmeans2.fit_predict(Y)
 
