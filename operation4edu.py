@@ -126,7 +126,7 @@ def clustering(df):
     row = df.iloc[0,3:25] # clus_df.iloc[clus_df["Student ID"] = x,3:25]
     # Plot a chart with selected row, can be replaced value 0 with input student ID
     values = list(row) #create a list contains grades
-    plt.figure(figsize = (15,6))
+    plt.figure(figsize = (25,10))
     ax = row.plot(kind='bar', label='Grade')
     mean_df.mean().plot(ax=ax, color='r', linestyle='-', label='Mean')
     ax.legend()
