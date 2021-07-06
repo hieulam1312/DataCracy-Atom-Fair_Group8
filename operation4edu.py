@@ -41,7 +41,7 @@ def get_df(file):
     df = pd.read_excel(file, engine='openpyxl')
   elif extension.upper() == 'PICKLE':
     df = pd.read_pickle(file)
-  return df.replace((" ",np.nan))
+  return df
 
 def check_student(df,id):
 
@@ -93,193 +93,200 @@ def download_link(object_to_download, download_filename, download_link_text):
     return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
 
 def clustering(df):
-  numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-  numerical_cols = df.select_dtypes(include=numerics)
-  index=st.sidebar.selectbox('CHỌN TRƯỜNG CHỨA MÃ SỐ SINH VIÊN',
-                          df.columns.tolist())     
-  if not index:
-    st.error('Vui lòng bổ sung trường thông tin tại sidebar')       
-  else:  
-    df=df.set_index([index]) 
-    obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
-                            numerical_cols.columns.tolist(),
-                            numerical_cols.columns.tolist())
-    
-    kmeans2 = KMeans(n_clusters=4) #number of cluster = 4
-    _list=[]
-    for i in obj:
-      _list.append(i)
-    y = df.loc[:,_list]
-    Y =y.reset_index()
-    Y["cluster"] = kmeans2.fit_predict(Y)
-    Y["cluster"] = Y["cluster"].astype("category")
+    numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    numerical_cols = df.select_dtypes(include=numerics)
+    index=st.sidebar.selectbox('CHỌN TRƯỜNG CHỨA MÃ SỐ SINH VIÊN',
+                            df.columns.tolist())     
+    if not index:
+      st.error('Vui lòng bổ sung trường thông tin tại sidebar')       
+    else:  
+      df=df.set_index([index]) 
+      obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
+                              numerical_cols.columns.tolist(),
+                              numerical_cols.columns.tolist())
+      
+      kmeans2 = KMeans(n_clusters=4) #number of cluster = 4
+      _list=[]
+      for i in obj:
+        _list.append(i)
+      y = df.loc[:,_list]
+      Y =y.reset_index()
+      Y["cluster"] = kmeans2.fit_predict(Y)
+      Y["cluster"] = Y["cluster"].astype("category")
 
-    Y["cluster"] = kmeans2.labels_
-    desc =Y.describe()
-    
-    st.markdown('PHÂN TÍCH TỔNG QUAN')
-    desc
-    st.markdown("")
-    st.markdown('PHỔ ĐIỂM TRUNG BÌNH')
-    mean_df = df.iloc[:,3:25] #Create a temporary df to calculate mean values
-# print(mean_df)
-    row = df.iloc[0,3:25] # clus_df.iloc[clus_df["Student ID"] = x,3:25]
-    # Plot a chart with selected row, can be replaced value 0 with input student ID
-    values = list(row) #create a list contains grades
-    plt.figure(figsize = (25,10))
-    ax = row.plot(kind='bar', label='Grade')
-    mean_df.mean().plot(ax=ax, color='r', linestyle='-', label='Mean')
-    ax.legend()
-    st.set_option('deprecation.showPyplotGlobalUse', False)
-    plt.xlabel("Grade per subject")
-    plt.show()
-    st.pyplot()
+      Y["cluster"] = kmeans2.labels_
+      desc =Y.describe()
+      
+      st.markdown('PHÂN TÍCH TỔNG QUAN')
+      desc
+      st.markdown("")
+      st.markdown('PHỔ ĐIỂM TRUNG BÌNH')
+      mean_df = df.iloc[:,3:25] #Create a temporary df to calculate mean values
+  # print(mean_df)
+      row = df.iloc[0,3:25] # clus_df.iloc[clus_df["Student ID"] = x,3:25]
+      # Plot a chart with selected row, can be replaced value 0 with input student ID
+      values = list(row) #create a list contains grades
+      plt.figure(figsize = (25,10))
+      ax = row.plot(kind='bar', label='Grade')
+      mean_df.mean().plot(ax=ax, color='r', linestyle='-', label='Mean')
+      ax.legend()
+      st.set_option('deprecation.showPyplotGlobalUse', False)
+      plt.xlabel("Grade per subject")
+      plt.show()
+      st.pyplot()
 
-    # Silhouette Coefficient to find optimal cluster
-    from sklearn.metrics import silhouette_score
-    silhouette_coefficients = []
-    kmeans_kwargs = {
-        "init": "random",
-        "n_init": 10,
-        "max_iter": 300,
-        "random_state": 42,
-    }
-    clus_dict = {} #contain number of cluster and silhouette coef
-    #Start at 2 clusters
-    for k in range(2, 11):
-        kmeans = KMeans(n_clusters=k, **kmeans_kwargs)
-        kmeans.fit(Y)
-        score = silhouette_score(Y, kmeans.labels_)
-        silhouette_coefficients.append(score)
-        clus_dict[k] = score
-    st.markdown('TÌM SỐ NHÓM TỐI ƯU THEO PHƯƠNG PHÁP SILHOUETTE')
-    #Draw chart to visualize clusters
-    fig=plt.figure(figsize = (20,15))
-    plt.plot(range(2,11), silhouette_coefficients)
-    plt.xticks(range(2,11))
-    plt.xlabel("Number of clusters")
-    plt.ylabel("Silhouette Coefficient")
-    plt.show()
-    st.pyplot(fig)
-    #Print and draw chart with optimal number of clusters
-    max_value = max(clus_dict, key=clus_dict.get)
-    st.markdown('Số nhóm tối ưu có thể chia là: ' + str(max_value))
-    st.markdown("")
+      # Silhouette Coefficient to find optimal cluster
+      from sklearn.metrics import silhouette_score
+      silhouette_coefficients = []
+      kmeans_kwargs = {
+          "init": "random",
+          "n_init": 10,
+          "max_iter": 300,
+          "random_state": 42,
+      }
+      clus_dict = {} #contain number of cluster and silhouette coef
+      #Start at 2 clusters
+      for k in range(2, 11):
+          kmeans = KMeans(n_clusters=k, **kmeans_kwargs)
+          kmeans.fit(Y)
+          score = silhouette_score(Y, kmeans.labels_)
+          silhouette_coefficients.append(score)
+          clus_dict[k] = score
+      st.markdown('TÌM SỐ NHÓM TỐI ƯU THEO PHƯƠNG PHÁP SILHOUETTE')
+      #Draw chart to visualize clusters
+      fig=plt.figure(figsize = (20,15))
+      plt.plot(range(2,11), silhouette_coefficients)
+      plt.xticks(range(2,11))
+      plt.xlabel("Number of clusters")
+      plt.ylabel("Silhouette Coefficient")
+      plt.show()
+      st.pyplot(fig)
+      #Print and draw chart with optimal number of clusters
+      max_value = max(clus_dict, key=clus_dict.get)
+      st.markdown('Số nhóm tối ưu có thể chia là: ' + str(max_value))
+      st.markdown("")
 
 
-    st.markdown('KẾT QUẢ PHÂN NHÓM VỚI CỤM TỐI ƯU')
-    st.markdown("")
-    kmeans = KMeans(n_clusters=max_value) #number of cluster = max value
-    n_clus=max_value
-    Y["cluster"] = kmeans.fit_predict(Y)
-    Y["cluster"] = Y["cluster"].astype("category")
-    print(Y)
-    kmeans.fit(Y)
-    Y["cluster"] = kmeans.labels_
-    sb.pairplot(data=Y,hue="cluster",height=5)
-    st.pyplot()
-    st.set_option('deprecation.showPyplotGlobalUse', False)
+      st.markdown('KẾT QUẢ PHÂN NHÓM VỚI CỤM TỐI ƯU')
+      st.markdown("")
+      kmeans = KMeans(n_clusters=max_value) #number of cluster = max value
+      n_clus=max_value
+      Y["cluster"] = kmeans.fit_predict(Y)
+      Y["cluster"] = Y["cluster"].astype("category")
+      print(Y)
+      kmeans.fit(Y)
+      Y["cluster"] = kmeans.labels_
+      sb.pairplot(data=Y,hue="cluster",height=5)
+      st.pyplot()
+      st.set_option('deprecation.showPyplotGlobalUse', False)
 
-    sb.relplot(
-        x="OMAT", y="OSTA", hue="cluster", data=Y, height=7)
-    st.pyplot()
-    
-    Y["cluster"] = kmeans2.fit_predict(Y)
+      sb.relplot(
+          x="OMAT", y="OSTA", hue="cluster", data=Y, height=3)
+      st.pyplot()
+      
+      Y["cluster"] = kmeans2.fit_predict(Y)
 
-    if st.button('LẤY DANH SÁCH KẾT QUẢ'):
-  #   #Print student ID based on clustering 
-      for i in range(n_clus): 
+      if st.button('LẤY DANH SÁCH KẾT QUẢ'):
+    #   #Print student ID based on clustering 
+        for i in range(n_clus): 
 
-          df_tmp0 = Y.loc[Y.cluster == i] #Cluster level from 0 to 3
+            df_tmp0 = Y.loc[Y.cluster == i] #Cluster level from 0 to 3
 
-          st.markdown('Danh sách sinh viên thuộc nhóm {}'.format(i+1))
-          student_id0=df_tmp0
-          df_tmp0
-          tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Bấm vào đây để tải file!')
-          st.markdown(tmp_download_link, unsafe_allow_html=True)
-
+            st.markdown('Danh sách sinh viên thuộc nhóm {}'.format(i+1))
+            student_id0=df_tmp0
+            df_tmp0
+            tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Bấm vào đây để tải file!')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
 def transform(df,first_cols,second_cols):
-        st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
-        st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
-        a=df[first_cols]
-        ii=a.columns.tolist()
-        x=round(len(ii)/2)
-        y=2
-        c = 1  # initialize plot counter
-        fig = plt.figure(figsize=(20,15))
-        for i in ii:
-            plt.subplot(x, y, c)
-            plt.title('{}, subplot: {}{}{}'.format(i, x, y, c))
-            plt.xlabel(i)
-            sns.countplot(df[i])
-            c = c + 1
+      st.title('A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
+      st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 1")
+      a=df[first_cols]
+      ii=a.columns.tolist()
+      x=round(len(ii)/2)
+      y=2
+      c = 1  # initialize plot counter
+      fig = plt.figure(figsize=(25,30))
+      for i in ii:
+          plt.subplot(x, y, c)
+          plt.title('{}, subplot: {}{}{}'.format(i, x, y, c))
+          plt.xlabel(i)
+          sns.countplot(df[i])
+          c = c + 1
 
-        plt.show()
-        st.pyplot(fig)
-        st.markdown("#### 2. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 2")
-        h=df[second_cols]
-        iii=h.columns.tolist()
-        d=round(len(iii)/2)
-        e=2
-        f= 1  # initialize plot counter
-        fig2 = plt.figure(figsize=(25,30  ))
-        for z in iii:
-            plt.subplot(d, e, f)
-            plt.title('{}, subplot: {}{}{}'.format(z, d, e, f))
-            plt.xlabel(z)
-            sns.countplot(df[z])
-            f = f + 1
-        plt.show()
-        st.pyplot(fig2)
-
-
+      plt.show()
+      st.pyplot(fig)
+      st.markdown("#### 2. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 2")
+      h=df[second_cols]
+      iii=h.columns.tolist()
+      d=round(len(iii)/2)
+      e=2
+      f= 1  # initialize plot counter
+      fig2 = plt.figure(figsize=(25,30  ))
+      for z in iii:
+          plt.subplot(d, e, f)
+          plt.title('{}, subplot: {}{}{}'.format(z, d, e, f))
+          plt.xlabel(z)
+          sns.countplot(df[z])
+          f = f + 1
+      plt.show()
+      st.pyplot(fig2)
 
 def abc(df,index1,index2,index3,numerical_cols,number,first_cols,_pass):
-      st.sidebar.markdown('B. ĐIỀU KIỆN ĐỂ TÌM DANH SÁCH SINH VIÊN')   
-      ds_df=number.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
+  st.sidebar.markdown('B. ĐIỀU KIỆN ĐỂ TÌM DANH SÁCH SINH VIÊN') 
+  ds_df=number.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
+  if _pass==0:
+      st.error('Vui lòng chọn số điểm qua môn để tiếp tục')
+  else:
       st.markdown('### 3. SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN NỀN TẢNG (NHÓM 1 & NHÓM 2')
+
       fig, ax = plt.subplots()
       first_df=df[first_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
       first_pass=first_df.loc[first_df.Scores>=_pass]
-      sns.barplot(data=first_pass,x=first_pass[index2],y="Scores")
+      count_first=first_pass.groupby(first_pass[index2]).count()
+      _first=count_first.reset_index()
+      sns.barplot(data=_first,x=_first[index2],y="Scores")
       st.pyplot(fig)
       st.markdown("")
+    
+  num=st.sidebar.number_input('Tổng số môn học nền tảng bắt buộc:',step=1)
+  if not num:
+    st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')
+  else:
       st.markdown("### 4. SỐ LƯỢNG SINH VIÊN ĐÃ HỌC XONG CÁC MÔN BẮT BUỘC")
-      num=st.sidebar.number_input('Tổng số môn học nền tảng bắt buộc:',step=1)
-      if not num:
-        st.sidebar.error('Vui lòng bổ sung trường thông tin tại sidebar')
-      else:
-          
-        ds_pass=ds_df.loc[ds_df.Scores>=_pass]
-        l=ds_pass.groupby([ds_pass[index1],ds_pass[index2]]).count()
-        l=l.reset_index()
-        _pass18=l.loc[l.Scores>=num]
-        pass18=_pass18.groupby(_pass18[index2]).count()
-      pass18= pass18.reset_index()
-      if len(pass18)==0:
-        st.write("Chưa có sinh viên nào hoàn thành tất cả các môn học")
-      else:
-        st.set_option('deprecation.showPyplotGlobalUse', False)
-        sns.barplot(data=pass18,x=index2,y=index1)
-        st.pyplot()
-      st.set_option('deprecation.showPyplotGlobalUse', False)
 
-      ds_terminate=ds_df.loc[(ds_df[index3].isnull()==False)] 
-      terminate=ds_terminate.groupby(ds_terminate[index2]).count()
-      ds_doing=ds_df.loc[(ds_df[index3].isnull()==True)]
-      doing=ds_doing.groupby(ds_doing[index2]).count()
-      doing['Đã thôi học']=terminate['Scores']
-      doing['Đang theo học']=doing['Scores']
-      doing['Phần trăm']=(doing['Đã thôi học']/doing['Đang theo học'])*100
-      a=doing[['Đang theo học','Đã thôi học','Phần trăm']]
-      a=a.reset_index()
+      ds_pass=ds_df.loc[ds_df.Scores>=_pass]
+      l=ds_pass.groupby([ds_pass[index1],ds_pass[index2]]).count()
+      l=l.reset_index()
+      _pass18=l.loc[l.Scores>=num]
+      pass18=_pass18.groupby(_pass18[index2]).count()
+  pass18= pass18.reset_index()
 
-      st.markdown('### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
-      a.plot(x=index2, y=['Đã thôi học','Đang theo học'], kind="bar")
-      st.pyplot()
-      #warning list 1
+  if len(pass18)==0:
+    st.write("Chưa có sinh viên nào hoàn thành tất cả các môn học")
+  else:
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    sns.barplot(data=pass18,x=index2,y=index1)
+    st.pyplot()
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+
+  ds_df[index3]=ds_df[index3].fillna('Doing')
+  status=ds_df
+
+  terminate=status[[index2,index3]]
+  _ter=terminate.value_counts()
+  _ter=_ter.reset_index()
+  # a=a.reset_index()
+  ter=_ter.pivot(index=index2,columns=index3,values=0)
+  ax=ter.plot.bar(stacked=True)
+  st.pyplot()
+
+  st.markdown('### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
+  sns.barplot(data=ter,x=_first[index2],y="Scores")
+  # _ter.plot(x=index2, y=['Đã thôi học','Đang theo học'], kind="bar")
+  # st.pyplot()
+  #warning list 1
+
 def out(df,index1,index2,index3,numerical_cols,first_cols,_pass):
-
       st.sidebar.markdown('C. TÌM SINH VIÊN RỚT NĂM 1')
       need=st.sidebar.multiselect('Đậu các môn bắt buộc',                      
                           numerical_cols.columns.tolist())
@@ -337,23 +344,20 @@ def out(df,index1,index2,index3,numerical_cols,first_cols,_pass):
       if st.button('Tải Danh sách tại đây'):
         tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
-
       
 def main():
 
 
-    st.markdown("<p style='text-align: center;'><strong><span style='font-size: 28px; font-family: Arial, Helvetica, sans-serif;color:orange'>ỨNG DỤNG</span></strong></p><p style='text-align: center;'><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 28px;color: orange'><strong>HỖ TRỢ QUẢN L&Yacute; TRONG GI&Aacute;O DỤC</strong></span></span></p>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: right;'><strong><em><span style='font-size: 12px;'>Tạo bởi: Atom Fair - Nhóm 8 (</span></em></strong><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Lâm Hiếu -&nbsp;</strong></em></span></span><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Toàn Trần;</strong></em></span></span><strong><em><span style='font-size: 12px; font-family: Arial, Helvetica, sans-serif;'>- Hạnh Nguyễn)</span></em></strong></p>", unsafe_allow_html=True)
-    files = st.file_uploader("Upload file", type=['csv','xlsx','pickle'],accept_multiple_files=False)
-    
+  st.markdown("<p style='text-align: center;'><strong><span style='font-size: 28px; font-family: Arial, Helvetica, sans-serif;color:orange'>ỨNG DỤNG</span></strong></p><p style='text-align: center;'><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 28px;color: orange'><strong>HỖ TRỢ QUẢN L&Yacute; TRONG GI&Aacute;O DỤC</strong></span></span></p>", unsafe_allow_html=True)
+  st.markdown("<p style='text-align: right;'><strong><em><span style='font-size: 12px;'>Tạo bởi: Atom Fair - Nhóm 8 (</span></em></strong><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Lâm Hiếu -&nbsp;</strong></em></span></span><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Toàn Trần;</strong></em></span></span><strong><em><span style='font-size: 12px; font-family: Arial, Helvetica, sans-serif;'>- Hạnh Nguyễn)</span></em></strong></p>", unsafe_allow_html=True)
+  files = st.file_uploader("Tải file chứa điểm của lớp", type=['csv','xlsx','pickle'],accept_multiple_files=False)
+  try:
     if not files:
-          st.write("Upload a .csv or .xlsx file to get started")
+          st.write("Tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
     else:
       df = get_df(files)
- 
-      data_df=df.replace((0,np.nan))
-      data_df.columns=data_df.columns.str.replace(" ","_")
-      choose=st.sidebar.selectbox('Enter your choose:',['Operation Dashboard','Student checking','Phân nhóm học tập'])
+
+      choose=st.sidebar.selectbox('Chọn nội dung báo cáo:',['Operation Dashboard','Student checking','Phân nhóm học tập'])
       if choose=='Operation Dashboard':
           st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
           index=st.sidebar.multiselect('Chọn thông tin cần xem báo cáo:',
@@ -367,14 +371,13 @@ def main():
           df=df.set_index([index1,index2,index3]) 
           numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
           numerical_cols = df.select_dtypes(include=numerics)
-          number=numerical_cols.reset_index()  
+          number=numerical_cols
           first_cols=st.sidebar.multiselect('Chọn tất cả các môn năm nhất để xem phổ điểm',
                       numerical_cols.columns.tolist())
           second_cols=st.sidebar.multiselect('Chọn tất cả các môn năm 2 để xem phổ điểm',
                       numerical_cols.columns.tolist())
           transform(df,first_cols,second_cols)
           _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
-
           abc(df,index1,index2,index3,numerical_cols,number,first_cols,_pass)
           out(df,index1,index2,index3,numerical_cols,first_cols,_pass)
       elif choose=='Student checking':
@@ -386,7 +389,9 @@ def main():
            
       elif choose == 'Phân nhóm học tập':
           clustering(df)
-
+  except:
+    st.error('Vui lòng nhập các thông tin tại sidebar để tiếp tục')
+  
 
 main()
 
