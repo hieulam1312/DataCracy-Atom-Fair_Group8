@@ -278,7 +278,6 @@ def abc(df,index1,index2,index3,numerical_cols,number,first_cols,_pass):
   # a=a.reset_index()
 
   st.markdown('### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
-  sns.barplot(data=ter,x=_first[index2],y="Scores")
   ter=_ter.pivot(index=index2,columns=index3,values=0)
   ax=ter.plot.bar(stacked=True)
   st.pyplot()
