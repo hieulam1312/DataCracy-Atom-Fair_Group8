@@ -35,55 +35,53 @@ from sklearn.cluster import KMeans
 def get_df(file):
   # get extension and read file
   extension = file.name.split('.')[1]
-  df=file
   if extension.upper() == 'CSV':
     df = pd.read_csv(file)
   elif extension.upper() == 'XLSX':
     df = pd.read_excel(file, engine='openpyxl')
   elif extension.upper() == 'PICKLE':
     df = pd.read_pickle(file)
-  return df
+  return df.replace((" ",np.nan))
 
 def check_student(df,id):
-  try:
-      id_column=st.sidebar.multiselect('Chọn trường chứa mã sinh viên và họ tên:',
-                          df.columns.tolist())
-      df[id_column]=df[id_column].astype('str')
-      id_st=id_column[0]
-      name=id_column[1]
-      if  df[id_st].str.contains(id).any()==False:
-        st.error('Mã số sinh viên chưa đúng. Vui lòng kiểm tra lại')
-      else:
-        st_id=df.loc[df[id_st]==id]
-        st_id=st_id.set_index(id_st)
-        numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-        numerical_cols = st_id.select_dtypes(include=numerics)
-        st_name=st_id[name].values.tolist()
-        st.markdown('### Hello {}'.format(st_name))
-        marks=numerical_cols
-        marks["Student_ID"]=id
-        mark=marks.melt(id_vars='Student_ID',var_name='Object',value_name='Scores')
-        mark=mark.loc[mark.Scores!=0]
-        sns.set(style='darkgrid', font_scale=2, rc={"figure.figsize": [20,10]})
-        # f, ax = plt.subplots(1, 1, figsize=(30, 15))
-        # a=sns.lineplot((x=avg,y=
-        x=mark['Object']
-        y=mark['Scores']
-              # Create some random data
-        y_mean = [np.mean(y)]*len(x)
 
-        fig,ax = plt.subplots()
-        data_line = ax.plot(x,y, label='Điểm số', marker='o')
-        mean_line = ax.plot(x,y_mean, label='Trung bình', linestyle='--')
-        # Make a legend
-        st.markdown('#### PHỔ ĐIỂM THEO MÔN HỌC')
-        legend = ax.legend(loc='upper right')
-        ax.set_ylabel('ĐIỂM SỐ')
-        ax.set_xlabel('MÔN HỌC')
-        st.set_option('deprecation.showPyplotGlobalUse', False)
-        st.pyplot()
-  except:
-    st.error('Vui lòng chọn các mục tại side bar để tiếp tục')
+    id_column=st.sidebar.multiselect('Chọn trường chứa mã sinh viên và họ tên:',
+                        df.columns.tolist())
+    df[id_column]=df[id_column].astype('str')
+    id_st=id_column[0]
+    name=id_column[1]
+    if  df[id_st].str.contains(id).any()==False:
+      st.error('Mã số sinh viên chưa đúng. Vui lòng kiểm tra lại')
+    else:
+      st_id=df.loc[df[id_st]==id]
+      st_id=st_id.set_index(id_st)
+      numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+      numerical_cols = st_id.select_dtypes(include=numerics)
+      st_name=st_id[name].values.tolist()
+      st.markdown('### Hello {}'.format(st_name))
+      marks=numerical_cols
+      marks["Student_ID"]=id
+      mark=marks.melt(id_vars='Student_ID',var_name='Object',value_name='Scores')
+      mark=mark.loc[mark.Scores!=0]
+      sns.set(style='darkgrid', font_scale=2, rc={"figure.figsize": [20,10]})
+      # f, ax = plt.subplots(1, 1, figsize=(30, 15))
+      # a=sns.lineplot((x=avg,y=
+      x=mark['Object']
+      y=mark['Scores']
+            # Create some random data
+      y_mean = [np.mean(y)]*len(x)
+
+      fig,ax = plt.subplots()
+      data_line = ax.plot(x,y, label='Điểm số', marker='o')
+      mean_line = ax.plot(x,y_mean, label='Trung bình', linestyle='--')
+      # Make a legend
+      st.markdown('#### PHỔ ĐIỂM THEO MÔN HỌC')
+      legend = ax.legend(loc='upper right')
+      ax.set_ylabel('ĐIỂM SỐ')
+      ax.set_xlabel('MÔN HỌC')
+      st.set_option('deprecation.showPyplotGlobalUse', False)
+      st.pyplot()
+
 def download_link(object_to_download, download_filename, download_link_text):
 
     if isinstance(object_to_download,pd.DataFrame):
