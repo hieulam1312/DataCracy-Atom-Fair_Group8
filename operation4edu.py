@@ -35,6 +35,7 @@ from sklearn.cluster import KMeans
 def get_df(file):
   # get extension and read file
   extension = file.name.split('.')[1]
+  df=file
   if extension.upper() == 'CSV':
     df = pd.read_csv(file)
   elif extension.upper() == 'XLSX':
