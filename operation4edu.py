@@ -276,15 +276,14 @@ def abc(df,index1,index2,index3,numerical_cols,number,first_cols,_pass):
   _ter=terminate.value_counts()
   _ter=_ter.reset_index()
   # a=a.reset_index()
+
+  st.markdown('### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
+  sns.barplot(data=ter,x=_first[index2],y="Scores")
   ter=_ter.pivot(index=index2,columns=index3,values=0)
   ax=ter.plot.bar(stacked=True)
   st.pyplot()
 
-  st.markdown('### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
-  sns.barplot(data=ter,x=_first[index2],y="Scores")
-  # _ter.plot(x=index2, y=['Đã thôi học','Đang theo học'], kind="bar")
-  # st.pyplot()
-  #warning list 1
+
 
 def out(df,index1,index2,index3,numerical_cols,first_cols,_pass):
       st.sidebar.markdown('C. TÌM SINH VIÊN RỚT NĂM 1')
