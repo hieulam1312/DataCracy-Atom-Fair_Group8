@@ -42,7 +42,7 @@ def get_df(file):
     df = pd.read_excel(file, engine='openpyxl')
   elif extension.upper() == 'PICKLE':
     df = pd.read_pickle(file)
-  return df.replace((" ",np.nan))
+  return df
 
 def check_student(df,id):
   try:
