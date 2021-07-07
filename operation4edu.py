@@ -210,7 +210,7 @@ def transform(df,first,index2,second):
       x=round(len(ii)/2)
       y=2
       c = 1  # initialize plot counter
-      fig = plt.figure(figsize=(20,15))
+      fig = plt.figure(figsize=(20,25))
       for i in ii:
           plt.subplot(x, y, c)
           plt.title('{}'.format(i))
