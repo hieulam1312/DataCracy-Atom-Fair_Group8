@@ -210,12 +210,12 @@ def transform(df,first,index2,second):
       x=round(len(ii)/2)
       y=2
       c = 1  # initialize plot counter
-      fig = plt.figure(figsize=(20,25))
+      fig = plt.figure(figsize=(20,15))
       for i in ii:
           plt.subplot(x, y, c)
           plt.title('{}'.format(i))
           plt.xlabel(i)
-          sns.countplot(df[i],color='blue')
+          sns.countplot(df[i])
           c = c + 1
       st.pyplot(fig)
 
@@ -228,7 +228,7 @@ def transform(df,first,index2,second):
       h=_h[first] #
       h=h.reset_index()
       h=h.melt(id_vars=index2,var_name='Object',value_name='Scores')
-      g = sns.FacetGrid(h, col=index2,row='Object',height=8, aspect=.95)
+      g = sns.FacetGrid(h, col=index2,row='Object')
       g.map(sns.histplot, "Scores")
       st.set_option('deprecation.showPyplotGlobalUse', False)
       st.pyplot()
@@ -392,7 +392,8 @@ def main():
           st.markdown(' - Điểm số các môn: Mỗi môn tương ứng với 1 cột')
  
           st.markdown('Dưới đây là hình ảnh minh họa 1 file đúng định dạng:')
-          st.image('Capture.PNG')
+          img1 = mpimg.imread('Capture.PNG')
+          st.image(img1, width = 100)
 
           st.markdown('#### C. MỜI BẠN BẮT ĐẦU SỬ DỤNG ỨNG DỤNG')
           st.write("Hãy tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
