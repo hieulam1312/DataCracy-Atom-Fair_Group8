@@ -215,7 +215,7 @@ def transform(df,first,index2,second):
           plt.subplot(x, y, c)
           plt.title('{}'.format(i))
           plt.xlabel(i)
-          sns.countplot(df[i],palette='blue')
+          sns.countplot(df[i])
           c = c + 1
       st.pyplot(fig)
 
@@ -228,7 +228,7 @@ def transform(df,first,index2,second):
       h=_h[first] #
       h=h.reset_index()
       h=h.melt(id_vars=index2,var_name='Object',value_name='Scores')
-      g = sns.FacetGrid(h, col=index2,row='Object',height=3.5, aspect=.65)
+      g = sns.FacetGrid(h, col=index2,row='Object')
       g.map(sns.histplot, "Scores")
       st.set_option('deprecation.showPyplotGlobalUse', False)
       st.pyplot()
@@ -376,6 +376,10 @@ def main():
           st.markdown('')
           st.markdown('Công cụ cho phép người dùng tải file định dạng csv hoặc excel chứa điểm của học viên. Với các trường tùy chọn thông tin tại bộ lọc sidebar để tự động truy xuất báo cáo.')
           st.markdown('Mục tiêu dự án hướng tới đối tượng sử dụng là các giảng viên/giáo viên/bộ phận quản lý đào tạo')
+          st.markdown('NỘI DUNG:')
+          st.markdown('- Operation Dashboard: Những chỉ số về điểm theo tổng quan')
+          st.markdown('- Student checking: Xem điểm chi tiết các môn của học viên')
+          st.markdown('- Phân nhóm học tập: Chia nhóm theo mô hình clustering')
           st.markdown('Dự án nằm trong chương trình Atom-Fair của DataCracy.')
           st.markdown('#### B. HƯỚNG DẪN ĐỊNH DẠNG FILE')
           st.markdown("")
@@ -398,6 +402,9 @@ def main():
       choose=st.sidebar.selectbox('Chọn nội dung báo cáo:',['Operation Dashboard','Student checking','Phân nhóm học tập'])
       if choose=='Operation Dashboard':
         st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
+        st.sidebar.markdown('Lưu ý thứ tự chọn lần lượt: ')
+        st.sidebar.markdown('Mã sinh viên - Tên lớp - Tình trạng')
+
         index=st.sidebar.multiselect('Chọn thông tin cần xem báo cáo:',
                         df.columns.tolist())
         index1=0
