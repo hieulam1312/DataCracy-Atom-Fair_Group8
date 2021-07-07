@@ -357,9 +357,9 @@ def out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass):
         else:
           file=l33
         file
-        if st.button('Tải Danh sách tại đây'):
-          tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
-          st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+        tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Bấm vào đây để tải danh sách!')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
       
 def main():
 
