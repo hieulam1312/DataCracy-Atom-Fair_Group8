@@ -364,11 +364,35 @@ def main():
 
 
   st.markdown("<p style='text-align: center;'><strong><span style='font-size: 28px; font-family: Arial, Helvetica, sans-serif;color:orange'>ỨNG DỤNG</span></strong></p><p style='text-align: center;'><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 28px;color: orange'><strong>HỖ TRỢ QUẢN L&Yacute; TRONG GI&Aacute;O DỤC</strong></span></span></p>", unsafe_allow_html=True)
-  st.markdown("<p style='text-align: right;'><strong><em><span style='font-size: 12px;'>Tạo bởi: Atom Fair - Nhóm 8 (</span></em></strong><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Lâm Hiếu -&nbsp;</strong></em></span></span><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Toàn Trần;</strong></em></span></span><strong><em><span style='font-size: 12px; font-family: Arial, Helvetica, sans-serif;'>- Hạnh Nguyễn)</span></em></strong></p>", unsafe_allow_html=True)
+  st.markdown("<p style='text-align: right;'><strong><em><span style='font-size: 12px;'>Tạo bởi: Atom Fair - Nhóm 8 (</span></em></strong><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Lâm Hiếu -&nbsp;</strong></em></span></span><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Toàn Trần </strong></em></span></span><strong><em><span style='font-size: 12px; font-family: Arial, Helvetica, sans-serif;'> - Hạnh Nguyễn)</span></em></strong></p>", unsafe_allow_html=True)
+  
+
   files = st.file_uploader("Tải file chứa điểm của lớp", type=['csv','xlsx','pickle'],accept_multiple_files=False)
   try:
     if not files:
-          st.write("Tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
+          st.markdown('#### I. GIỚI THIỆU')
+          st.markdown("")
+          st.markdown('Operation4edu là công cụ phân tích điểm học tập của sinh viên. Cung cấp cho người dùng những thông tin quan trọng về tình hình học tập của sinh viên. Từ đó giúp giảng viên và bộ phận quản lý đưa ra những quyết định trong vận hành.')
+          st.markdown('')
+          st.markdown('Công cụ cho phép người dùng tải file định dạng csv hoặc excel chứa điểm của học viên. Với các trường tùy chọn thông tin tại bộ lọc sidebar để tự động truy xuất báo cáo.')
+          st.markdown('Mục tiêu dự án hướng tới đối tượng sử dụng là các giảng viên/giáo viên/bộ phận quản lý đào tạo')
+          st.markdown('Dự án nằm trong chương trình Atom-Fair của DataCracy.')
+          st.markdown('#### B. HƯỚNG DẪN ĐỊNH DẠNG FILE')
+          st.markdown("")
+          st.markdown('#### 1. Các trường thông tin bắt buộc')
+          st.markdown('')
+          st.markdown('- Mã số học viên: Mỗi học viên chỉ có 1 mã số học viên duy nhất')
+          st.markdown(' - Tên học viên')
+          st.markdown('- Lớp học: Tên lớp của học viên')
+          st.markdown('- Tình trạng nghỉ học: Chứa thông tin các học viên đã nghỉ học')
+          st.markdown(' - Điểm số các môn: Mỗi môn tương ứng với 1 cột')
+ 
+          st.markdown('Dưới đây là hình ảnh minh họa 1 file đúng định dạng:')
+          st.image('Capture.PNG')
+
+          st.markdown('#### C. MỜI BẠN BẮT ĐẦU SỬ DỤNG ỨNG DỤNG')
+          st.write("Hãy tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
+
     else:
       df = get_df(files)
       choose=st.sidebar.selectbox('Chọn nội dung báo cáo:',['Operation Dashboard','Student checking','Phân nhóm học tập'])
