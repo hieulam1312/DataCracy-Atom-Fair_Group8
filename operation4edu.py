@@ -215,7 +215,8 @@ def transform(df,first,index2,second):
           plt.subplot(x, y, c)
           plt.title('{}'.format(i))
           plt.xlabel(i)
-          sns.countplot(df[i],color='blue',height=5)
+          countplt, ax = plt.subplots(figsize = (10,7))
+          sns.countplot(df[i],color='blue')
           c = c + 1
       st.pyplot(fig)
 
