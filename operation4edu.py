@@ -202,6 +202,7 @@ def clustering(df):
             tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Bấm vào đây để tải file!')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 def transform(df,first,index2,second):
+
       st.write('### A. BÁO CÁO TỔNG QUAN TÌNH HÌNH LỚP HỌC')
       st.markdown("#### 1. PHỔ ĐIỂM TRUNG BÌNH THEO MÔN HỌC")
       a=df[first]
@@ -210,16 +211,12 @@ def transform(df,first,index2,second):
       y=2
       c = 1  # initialize plot counter
       fig = plt.figure(figsize=(20,15))
-      sns.set_theme(style="darkgrid")
-
       for i in ii:
           plt.subplot(x, y, c)
           plt.title('{}'.format(i))
           plt.xlabel(i)
           sns.countplot(df[i])
           c = c + 1
-        
-      plt.show()
       st.pyplot(fig)
 
       df=df.reset_index()
@@ -369,55 +366,57 @@ def main():
   st.markdown("<p style='text-align: center;'><strong><span style='font-size: 28px; font-family: Arial, Helvetica, sans-serif;color:orange'>ỨNG DỤNG</span></strong></p><p style='text-align: center;'><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 28px;color: orange'><strong>HỖ TRỢ QUẢN L&Yacute; TRONG GI&Aacute;O DỤC</strong></span></span></p>", unsafe_allow_html=True)
   st.markdown("<p style='text-align: right;'><strong><em><span style='font-size: 12px;'>Tạo bởi: Atom Fair - Nhóm 8 (</span></em></strong><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Lâm Hiếu -&nbsp;</strong></em></span></span><span style='font-family: Arial, Helvetica, sans-serif;'><span style='font-size: 12px;'><em><strong>Toàn Trần;</strong></em></span></span><strong><em><span style='font-size: 12px; font-family: Arial, Helvetica, sans-serif;'>- Hạnh Nguyễn)</span></em></strong></p>", unsafe_allow_html=True)
   files = st.file_uploader("Tải file chứa điểm của lớp", type=['csv','xlsx','pickle'],accept_multiple_files=False)
-# try:
-  if not files:
-        st.write("Tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
-  else:
-    df = get_df(files)
-    choose=st.sidebar.selectbox('Chọn nội dung báo cáo:',['Operation Dashboard','Student checking','Phân nhóm học tập'])
-    if choose=='Operation Dashboard':
-      st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
-      index=st.sidebar.multiselect('Chọn thông tin cần xem báo cáo:',
-                      df.columns.tolist())
-      index1=0
-      index2=0
-      index3=0
-      index1=index[0]                 
-      index2=index[1]
-      index3=index[2]
-      df=df.set_index([index1,index2,index3]) 
-      numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-      numerical_cols = df.select_dtypes(include=numerics)
-      number=numerical_cols
-      st.sidebar.markdown('B. CHỌN NỘI DUNG ĐỂ XEM BÁO CÁO')
+  try:
+    if not files:
+          st.write("Tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
+    else:
+      df = get_df(files)
+      choose=st.sidebar.selectbox('Chọn nội dung báo cáo:',['Operation Dashboard','Student checking','Phân nhóm học tập'])
+      if choose=='Operation Dashboard':
+        st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
+        index=st.sidebar.multiselect('Chọn thông tin cần xem báo cáo:',
+                        df.columns.tolist())
+        index1=0
+        index2=0
+        index3=0
+        index1=index[0]                 
+        index2=index[1]
+        index3=index[2]
+        df=df.set_index([index1,index2,index3]) 
+        numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+        numerical_cols = df.select_dtypes(include=numerics)
+        number=numerical_cols
+        st.sidebar.markdown('B. CHỌN NỘI DUNG ĐỂ XEM BÁO CÁO')
 
-      sl=st.sidebar.selectbox('',['PHỔ ĐIỂM','XUẤT BÁO CÁO'])
-      if sl=='PHỔ ĐIỂM':
-        _df=df.reset_index()
-        first=st.sidebar.multiselect('Chọn tất cả các môn để xem phổ điểm',
-                    numerical_cols.columns.tolist())
-        second=st.sidebar.multiselect('Chọn tất cả các lớp để so sánh',
-                    _df[index2].unique())
-        transform(df,first,index2,second)
-      else:
-        first_cols=st.sidebar.multiselect('Chọn tất cả các môn năm nhất để xem phổ điểm',
+        sl=st.sidebar.selectbox('',['PHỔ ĐIỂM','XUẤT BÁO CÁO'])
+        if sl=='PHỔ ĐIỂM':
+          _df=df.reset_index()
+          first=st.sidebar.multiselect('Chọn tất cả các môn để xem phổ điểm',
                       numerical_cols.columns.tolist())
-        second_cols=st.sidebar.multiselect('Chọn tất cả các môn năm hai để xem phổ điểm',
-                    numerical_cols.columns.tolist())
-        _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
-        abc(df,index1,index2,index3,number,first_cols,second_cols,_pass)
-        out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass)
-    elif choose=='Student checking':
-        st_id=st.sidebar.text_input('Nhập mã sinh viên:',"")
-        if not st_id:
-          st.sidebar.error('Vui lòng nhập mã số sinh viên')
+          second=st.sidebar.multiselect('Chọn tất cả các lớp để so sánh',
+                      _df[index2].unique().tolist())
+
+          transform(df,first,index2,second)
         else:
-          check_student(df,st_id)
-          
-    elif choose == 'Phân nhóm học tập':
-        clustering(df)
-  # except:
-  #   st.error('Vui lòng nhập các thông tin tại sidebar để tiếp tục')
+          first_cols=st.sidebar.multiselect('Chọn tất cả các môn năm nhất để xem phổ điểm',
+                        numerical_cols.columns.tolist())
+          second_cols=st.sidebar.multiselect('Chọn tất cả các môn năm hai để xem phổ điểm',
+                      numerical_cols.columns.tolist())
+          _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
+
+          abc(df,index1,index2,index3,number,first_cols,second_cols,_pass)
+          out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass)
+      elif choose=='Student checking':
+          st_id=st.sidebar.text_input('Nhập mã sinh viên:',"")
+          if not st_id:
+            st.sidebar.error('Vui lòng nhập mã số sinh viên')
+          else:
+            check_student(df,st_id)
+            
+      elif choose == 'Phân nhóm học tập':
+          clustering(df)
+  except:
+    st.error('Vui lòng nhập các thông tin tại sidebar để tiếp tục')
   
 
 main()
