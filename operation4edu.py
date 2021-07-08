@@ -393,7 +393,7 @@ def main():
  
           st.markdown('Dưới đây là hình ảnh minh họa 1 file đúng định dạng:')
           img1 = mpimg.imread('Capture.PNG')
-          st.image(img1, width = 100)
+          st.image(img1)
 
           st.markdown('#### C. MỜI BẠN BẮT ĐẦU SỬ DỤNG ỨNG DỤNG')
           st.write("Hãy tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
