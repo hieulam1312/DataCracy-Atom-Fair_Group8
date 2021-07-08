@@ -35,7 +35,7 @@ import seaborn as sb
 # import pandas_profiling as pp
 from scipy.cluster.hierarchy import fcluster
 from sklearn.cluster import KMeans
-
+st.set_page_config(layout="wide")
 def get_df(file):
   # get extension and read file
   extension = file.name.split('.')[1]
