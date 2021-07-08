@@ -353,9 +353,9 @@ def out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass):
         if cho=='SINH VIÊN NĂM NHẤT CẦN ĐƯỢC CẢNH BÁO':
           file=warning_list1
         elif cho=='SINH VIÊN ĐƯỢC HỌC MÔN CHUYÊN NGÀNH':
-          file=l22
-        else:
           file=l33
+        else:
+          file=l22
         file
         tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
