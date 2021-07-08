@@ -62,12 +62,12 @@ def check_student(df,id):
       numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
       numerical_cols = st_id.select_dtypes(include=numerics)
       st_name=st_id[name].values.tolist()
-      st.markdown('### Hello {}'.format(st_name))
+      st.markdown('### Hello {}'.format(st_name[0]))
       marks=numerical_cols
       marks["Student_ID"]=id
       mark=marks.melt(id_vars='Student_ID',var_name='Object',value_name='Scores')
       mark=mark.loc[mark.Scores!=0]
-      sns.set(style='darkgrid', font_scale=2, rc={"figure.figsize": [20,10]})
+      sns.set(style='whitegrid', font_scale=2, rc={"figure.figsize": [35,25]})
       # f, ax = plt.subplots(1, 1, figsize=(30, 15))
       # a=sns.lineplot((x=avg,y=
       x=mark['Object']
@@ -114,10 +114,10 @@ def clustering(df):
       for i in obj:
         _list.append(i)
       y = df.loc[:,_list]
-      Y =y.reset_index()
+      Y =y 
+      St_ID=y.reset_index()
       Y["cluster"] = kmeans2.fit_predict(Y)
       Y["cluster"] = Y["cluster"].astype("category")
-
       Y["cluster"] = kmeans2.labels_
       desc =Y.describe()
       
@@ -158,7 +158,7 @@ def clustering(df):
           clus_dict[k] = score
       st.markdown('TÌM SỐ NHÓM TỐI ƯU THEO PHƯƠNG PHÁP SILHOUETTE')
       #Draw chart to visualize clusters
-      fig=plt.figure(figsize = (20,15))
+      fig=plt.figure(figsize = (15,10))
       plt.plot(range(2,11), silhouette_coefficients)
       plt.xticks(range(2,11))
       plt.xlabel("Number of clusters")
@@ -169,23 +169,24 @@ def clustering(df):
       max_value = max(clus_dict, key=clus_dict.get)
       st.markdown('Số nhóm tối ưu có thể chia là: ' + str(max_value))
       st.markdown("")
-
+      number_clus=st.number_input('Nhập số nhóm muốn cluster tại đây:',step=1)
 
       st.markdown('KẾT QUẢ PHÂN NHÓM VỚI CỤM TỐI ƯU')
       st.markdown("")
-      kmeans = KMeans(n_clusters=max_value) #number of cluster = max value
-      n_clus=max_value
+      if not number_clus:
+        kmeans = KMeans(n_clusters=max_value) #number of cluster = max value
+        n_clus=max_value
+      else:
+        kmeans = KMeans(n_clusters=number_clus) #number of cluster = max value
+        n_clus=number_clus
       Y["cluster"] = kmeans.fit_predict(Y)
       Y["cluster"] = Y["cluster"].astype("category")
       print(Y)
       kmeans.fit(Y)
       Y["cluster"] = kmeans.labels_
-      sb.pairplot(data=Y,hue="cluster",height=5)
-      st.pyplot()
       st.set_option('deprecation.showPyplotGlobalUse', False)
 
-      sb.relplot(
-          x="OMAT", y="OSTA", hue="cluster", data=Y, height=3)
+      sb.pairplot(data=Y,hue="cluster",palette="viridis", height=4)
       st.pyplot()
       
       Y["cluster"] = kmeans2.fit_predict(Y)
@@ -197,7 +198,7 @@ def clustering(df):
             df_tmp0 = Y.loc[Y.cluster == i] #Cluster level from 0 to 3
 
             st.markdown('Danh sách sinh viên thuộc nhóm {}'.format(i+1))
-            student_id0=df_tmp0
+            df_tmp0=df_tmp0.reset_index()
             df_tmp0
             tmp_download_link = download_link(df_tmp0, 'YOUR_DF.csv', 'Bấm vào đây để tải file!')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
@@ -253,7 +254,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       stacked_data2 = _first_df.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
 
-      stacked_data2.plot(kind="bar", stacked=True)
+      stacked_data2.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"})
       plt.xlabel("Lớp")
       plt.ylabel("%")
       # ax=_second_df.plot.bar(stacked=True)
@@ -273,15 +274,14 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       stacked_data = _second_df.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
 
-      stacked_data.plot(kind="bar", stacked=True)
+      stacked_data.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"}
+)
   
       plt.xlabel("Lớp")
       plt.ylabel("%")
       # ax=_second_df.plot.bar(stacked=True)
       st.pyplot()
-
-
-      ds_df[index3]=ds_df[index3].fillna('Doing')
+      ds_df[index3] = ds_df[index3].apply(lambda x: 'Đang học' if  pd.isnull(x) else 'Nghỉ học')
       status=ds_df
       terminate=status[[index2,index3]]
       _ter=terminate.value_counts()
@@ -292,7 +292,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       ter=_ter.pivot(index=index2,columns=index3,values=0)
       stacked_data3 = ter.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
-      stacked_data3.plot(kind="bar", stacked=True)
+      stacked_data3.plot(kind="bar", stacked=True,color={"Nghỉ học": "orange", "Đang học": "blue"})
       plt.xlabel("Lớp")
       plt.ylabel("%")
       st.pyplot()
@@ -357,8 +357,7 @@ def out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass):
         else:
           file=l33
         file
-
-        tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Bấm vào đây để tải danh sách!')
+        tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
       
 def main():
@@ -394,7 +393,8 @@ def main():
  
           st.markdown('Dưới đây là hình ảnh minh họa 1 file đúng định dạng:')
           img1 = mpimg.imread('Capture.PNG')
-          st.image(img1)
+          st.image(img1, width = 100)
+
           st.markdown('#### C. MỜI BẠN BẮT ĐẦU SỬ DỤNG ỨNG DỤNG')
           st.write("Hãy tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
 
