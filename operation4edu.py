@@ -240,6 +240,9 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
   if _pass==0:
       st.error('Vui lòng chọn số điểm qua môn để tiếp tục')
   else:
+    row0_1, row0_2 = st.beta_columns(
+    (1, 1))
+    with row0_1:
       st.markdown('#### 3. TỈ LỆ GIỮA SINH VIÊN ĐẠT VÀ CHƯA ĐẠT CÁC MÔN NĂM 1')
 
       fig, ax = plt.subplots()
@@ -260,7 +263,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       # ax=_second_df.plot.bar(stacked=True)
       st.pyplot()
 
-
+    with row0_2:
       st.markdown("#### 4. TỈ LỆ SINH VIÊN ĐẠT VÀ CHƯA ĐẠT CÁC MÔN NĂM 2")
       fig, ax = plt.subplots()
       second_df=df[second_cols].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
@@ -274,8 +277,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       stacked_data = _second_df.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
 
-      stacked_data.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"}
-)
+      stacked_data.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"})
   
       plt.xlabel("Lớp")
       plt.ylabel("%")
@@ -288,17 +290,17 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       _ter=_ter.reset_index()
       # a=a.reset_index()
 
-      st.markdown('#### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
-      ter=_ter.pivot(index=index2,columns=index3,values=0)
-      stacked_data3 = ter.apply(lambda x: x*100/sum(x), axis=1)
-      st.set_option('deprecation.showPyplotGlobalUse', False)
-      stacked_data3.plot(kind="bar", stacked=True,color={"Nghỉ học": "orange", "Đang học": "blue"})
-      plt.xlabel("Lớp")
-      plt.ylabel("%")
-      st.pyplot()
-      # _ter.plot(x=index2, y=['Đã thôi học','Đang theo học'], kind="bar")
-      # st.pyplot()
-      #warning list 1
+    st.markdown('#### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
+    ter=_ter.pivot(index=index2,columns=index3,values=0)
+    stacked_data3 = ter.apply(lambda x: x*100/sum(x), axis=1)
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    stacked_data3.plot(kind="bar", stacked=True,color={"Nghỉ học": "orange", "Đang học": "blue"},figsize=(10, 5))
+    plt.xlabel("Lớp")
+    plt.ylabel("%")
+    st.pyplot()
+    # _ter.plot(x=index2, y=['Đã thôi học','Đang theo học'], kind="bar")
+    # st.pyplot()
+    #warning list 1
 
 def out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass):
       st.sidebar.markdown('B. TÌM SINH VIÊN RỚT NĂM 1')
@@ -353,9 +355,9 @@ def out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass):
         if cho=='SINH VIÊN NĂM NHẤT CẦN ĐƯỢC CẢNH BÁO':
           file=warning_list1
         elif cho=='SINH VIÊN ĐƯỢC HỌC MÔN CHUYÊN NGÀNH':
-          file=l33
-        else:
           file=l22
+        else:
+          file=l33
         file
         tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
