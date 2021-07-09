@@ -105,7 +105,6 @@ def clustering(df):
     else:  
       df=df.set_index([index]) 
       obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
-                              numerical_cols.columns.tolist(),
                               numerical_cols.columns.tolist())
       
       kmeans2 = KMeans(n_clusters=4) #number of cluster = 4
@@ -118,10 +117,6 @@ def clustering(df):
       Y["cluster"] = kmeans2.fit_predict(Y)
       Y["cluster"] = Y["cluster"].astype("category")
       Y["cluster"] = kmeans2.labels_
-      desc =Y.describe()
-      
-      st.markdown('PHÂN TÍCH TỔNG QUAN')
-      desc
       st.markdown("")
       st.markdown('PHỔ ĐIỂM TRUNG BÌNH')
       mean_df = df.iloc[:,3:25] #Create a temporary df to calculate mean values
