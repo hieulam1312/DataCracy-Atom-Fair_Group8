@@ -151,7 +151,7 @@ def clustering(df):
           clus_dict[k] = score
       st.markdown('TÌM SỐ NHÓM TỐI ƯU THEO PHƯƠNG PHÁP SILHOUETTE')
       #Draw chart to visualize clusters
-      fig=plt.figure(figsize = (15,10))
+      fig=plt.figure(figsize = (25,15))
       plt.plot(range(2,11), silhouette_coefficients)
       plt.xticks(range(2,11))
       plt.xlabel("Number of clusters")
@@ -176,7 +176,7 @@ def clustering(df):
       print(Y)
       kmeans.fit(Y)
       Y["cluster"] = kmeans.labels_
-      sb.pairplot(data=Y,hue="cluster",palette='rocket',height=6)
+      sb.pairplot(data=Y,hue="cluster",palette='rocket',height=7)
       st.pyplot()
       
       Y["cluster"] = kmeans2.fit_predict(Y)
