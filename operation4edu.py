@@ -127,6 +127,7 @@ def clustering(df):
       values = list(row) #create a list contains grades
       plt.figure(figsize = (25,10))
       ax = row.plot(kind='bar', label='Grade')
+      sns.set(style='whitegrid', font_scale=4, rc={"figure.figsize": [35,25]})
       mean_df.mean().plot(ax=ax, color='r', linestyle='-', label='Mean')
       ax.legend()
       st.set_option('deprecation.showPyplotGlobalUse', False)
