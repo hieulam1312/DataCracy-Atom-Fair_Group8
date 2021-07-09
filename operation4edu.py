@@ -259,7 +259,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       stacked_data2 = _first_df.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
 
-      stacked_data2.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"},fontsize = 60)
+      stacked_data2.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"},fontsize = 50,figsize=(20, 20))
       plt.xlabel("Lớp")
       plt.ylabel("%")
       # ax=_second_df.plot.bar(stacked=True)
@@ -279,7 +279,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       stacked_data = _second_df.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
 
-      stacked_data.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"},fontsize = 60,figsize=(20, 20))
+      stacked_data.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"},fontsize = 50,figsize=(20, 20))
   
       plt.xlabel("Lớp")
       plt.ylabel("%")
