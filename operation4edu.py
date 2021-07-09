@@ -66,7 +66,7 @@ def check_student(df,id):
       marks["Student_ID"]=id
       mark=marks.melt(id_vars='Student_ID',var_name='Object',value_name='Scores')
       mark=mark.loc[mark.Scores!=0]
-      sns.set(style='whitegrid', font_scale=2, rc={"figure.figsize": [35,25]})
+      sns.set(style='whitegrid', font_scale=4, rc={"figure.figsize": [35,25]})
       # f, ax = plt.subplots(1, 1, figsize=(30, 15))
       # a=sns.lineplot((x=avg,y=
       x=mark['Object']
