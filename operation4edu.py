@@ -96,6 +96,7 @@ def download_link(object_to_download, download_filename, download_link_text):
     return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
 
 def clustering(df):
+    sb.set(rc={"figure.dpi":300, 'savefig.dpi':300})
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     numerical_cols = df.select_dtypes(include=numerics)
     index=st.sidebar.selectbox('CHỌN TRƯỜNG CHỨA MÃ SỐ SINH VIÊN',
@@ -176,7 +177,7 @@ def clustering(df):
       print(Y)
       kmeans.fit(Y)
       Y["cluster"] = kmeans.labels_
-      sb.pairplot(data=Y,hue="cluster",palette='viridis',height=6)
+      sb.pairplot(data=Y,hue="cluster",palette='viridis',height=4)
       st.pyplot()
       
       Y["cluster"] = kmeans2.fit_predict(Y)
