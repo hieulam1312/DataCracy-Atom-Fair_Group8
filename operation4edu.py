@@ -119,6 +119,8 @@ def clustering(df):
       Y["cluster"] = Y["cluster"].astype("category")
       Y["cluster"] = kmeans2.labels_
       st.markdown("")
+      sns.set(style='whitegrid', font_scale=2, rc={"figure.figsize": [35,25]})
+
       st.markdown('PHỔ ĐIỂM TRUNG BÌNH')
       mean_df = df.iloc[:,3:25] #Create a temporary df to calculate mean values
   # print(mean_df)
@@ -127,7 +129,6 @@ def clustering(df):
       values = list(row) #create a list contains grades
       plt.figure(figsize = (25,10))
       ax = row.plot(kind='bar', label='Grade')
-      sns.set(style='whitegrid', font_scale=2, rc={"figure.figsize": [35,25]})
       mean_df.mean().plot(ax=ax, color='r', linestyle='-', label='Mean')
       ax.legend()
       st.set_option('deprecation.showPyplotGlobalUse', False)
