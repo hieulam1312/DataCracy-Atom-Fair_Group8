@@ -291,7 +291,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       _ter=terminate.value_counts()
       _ter=_ter.reset_index()
       # a=a.reset_index()
-    st.markdown('**Ghi chú:**')
+    # st.markdown('**Ghi chú:**')
     # st.markdown('- So sánh tỉ lệ Đậu/Rớt các môn học năm nhất và năm 2 của các lớp')
     # st.markdown('- Có thể tùy chọn môn, thêm hoặc bớt môn tại bộ lọc')
     # st.markdown('#### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
