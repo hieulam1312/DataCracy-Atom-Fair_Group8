@@ -258,7 +258,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       _first_df=_first_df.pivot(index=index2,columns='STATUS',values=0)
       stacked_data2 = _first_df.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
-
+      plt.rcParams.update({'font.size': 22})
       stacked_data2.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"})
       plt.xlabel("Lớp")
       plt.ylabel("%")
@@ -278,7 +278,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       _second_df=_second_df.pivot(index=index2,columns='STATUS',values=0)
       stacked_data = _second_df.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
-
+      plt.rcParams.update({'font.size': 22})
       stacked_data.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"})
   
       plt.xlabel("Lớp")
@@ -298,7 +298,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
     ter=_ter.pivot(index=index2,columns=index3,values=0)
     stacked_data3 = ter.apply(lambda x: x*100/sum(x), axis=1)
     st.set_option('deprecation.showPyplotGlobalUse', False)
-    stacked_data3.plot(kind="bar", stacked=True,color={"Nghỉ học": "orange", "Đang học": "blue"},figsize=(10, 5))
+    stacked_data3.plot(kind="bar", stacked=True,color={"Nghỉ học": "orange", "Đang học": "blue"},figsize=(25, 10))
     plt.xlabel("Lớp")
     plt.ylabel("%")
     st.pyplot()
