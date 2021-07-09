@@ -61,7 +61,7 @@ def check_student(df,id):
       numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
       numerical_cols = st_id.select_dtypes(include=numerics)
       st_name=st_id[name].values.tolist()
-      st.markdown('### Hello {}'.format(st_name[0]))
+      st.markdown('### Sinh viên: {}'.format(st_name[0]))
       marks=numerical_cols
       marks["Student_ID"]=id
       mark=marks.melt(id_vars='Student_ID',var_name='Object',value_name='Scores')
@@ -76,7 +76,7 @@ def check_student(df,id):
 
       fig,ax = plt.subplots()
       data_line = ax.plot(x,y, label='Điểm số', marker='o')
-      mean_line = ax.plot(x,y_mean, label='Trung bình', linestyle='--')
+      mean_line = ax.plot(x,y_mean, label='Trung bình', linestyle='--',color='red')
       # Make a legend
       st.markdown('#### PHỔ ĐIỂM THEO MÔN HỌC')
       legend = ax.legend(loc='upper right')
@@ -121,20 +121,6 @@ def clustering(df):
       st.markdown("")
       sns.set(style='whitegrid', font_scale=2, rc={"figure.figsize": [35,25]})
 
-      st.markdown('PHỔ ĐIỂM TRUNG BÌNH')
-      mean_df = df.iloc[:,3:25] #Create a temporary df to calculate mean values
-  # print(mean_df)
-      row = df.iloc[0,3:25] # clus_df.iloc[clus_df["Student ID"] = x,3:25]
-      # Plot a chart with selected row, can be replaced value 0 with input student ID
-      values = list(row) #create a list contains grades
-      plt.figure(figsize = (25,10))
-      ax = row.plot(kind='bar', label='Grade')
-      mean_df.mean().plot(ax=ax, color='r', linestyle='-', label='Mean')
-      ax.legend()
-      st.set_option('deprecation.showPyplotGlobalUse', False)
-      plt.xlabel("Grade per subject")
-      plt.show()
-      st.pyplot()
       # Silhouette Coefficient to find optimal cluster
       from sklearn.metrics import silhouette_score
       silhouette_coefficients = []
@@ -339,12 +325,12 @@ def out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass):
         pass_df=df[all].reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
         _pass_df=pass_df.loc[(pass_df.Scores>=_pass)]
         _pass_count=_pass_df.groupby(_pass_df[index1]).Scores.count()
-        list2=_pass_count.loc[_pass_count.values >=co]
+        list2=_pass_count.loc[_pass_count.values ==co]
         list2=list2.reset_index()
         list22=pd.DataFrame(list2[index1])
         l22=list22.merge(df,how='left',on=index1)
         se=len(second_cols)
-        pass_scond=_pass_count.loc[_pass_count.values >=se]
+        pass_scond=_pass_count.loc[_pass_count.values ==se]
         list3=pass_scond.reset_index()
         list33=pd.DataFrame(list3[index1])
         l33=list33.merge(df,how='left',on=index1)
@@ -355,9 +341,9 @@ def out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass):
         if cho=='SINH VIÊN NĂM NHẤT CẦN ĐƯỢC CẢNH BÁO':
           file=warning_list1
         elif cho=='SINH VIÊN ĐƯỢC HỌC MÔN CHUYÊN NGÀNH':
-          file=l22
-        else:
           file=l33
+        else:
+          file=l22
         file
         tmp_download_link = download_link(file, 'YOUR_DF.csv', 'Click here to download your data!')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
