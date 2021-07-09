@@ -105,7 +105,6 @@ def clustering(df):
     else:  
       df=df.set_index([index]) 
       obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
-                              numerical_cols.columns.tolist(),
                               numerical_cols.columns.tolist())
       
       kmeans2 = KMeans(n_clusters=4) #number of cluster = 4
@@ -118,10 +117,7 @@ def clustering(df):
       Y["cluster"] = kmeans2.fit_predict(Y)
       Y["cluster"] = Y["cluster"].astype("category")
       Y["cluster"] = kmeans2.labels_
-      desc =Y.describe()
-      
-      st.markdown('PHÂN TÍCH TỔNG QUAN')
-      desc
+
       st.markdown("")
       st.markdown('PHỔ ĐIỂM TRUNG BÌNH')
       mean_df = df.iloc[:,3:25] #Create a temporary df to calculate mean values
@@ -210,7 +206,7 @@ def transform(df,first,index2,second):
       x=round(len(ii)/2)
       y=2
       c = 1  # initialize plot counter
-      fig = plt.figure(figsize=(20,15))
+      fig = plt.figure(figsize=(25,15))
       for i in ii:
           plt.subplot(x, y, c)
           plt.title('{}'.format(i))
@@ -219,7 +215,10 @@ def transform(df,first,index2,second):
           sns.countplot(df[i],color='Green')
           c = c + 1
       st.pyplot(fig)
-
+      st.markdown('**Ghi chú:**')
+      st.markdown('- Trục X: Các mức điểm mà sinh viên đạt được theo môn học')
+      st.markdown('- Trục Y: Số lượng học viên đạt được')
+      st.markdown('- Có thể tùy chọn môn, thêm hoặc bớt môn tại bộ lọc')
       df=df.reset_index()
       st.markdown("#### 2. PHỔ ĐIỂM TRUNG BÌNH CỦA NHÓM 2")
       _w=[]
@@ -229,11 +228,15 @@ def transform(df,first,index2,second):
       h=_h[first] #
       h=h.reset_index()
       h=h.melt(id_vars=index2,var_name='Object',value_name='Scores')
-      g = sns.FacetGrid(h, col=index2,row='Object',height=8,aspect=.9)
+      g = sns.FacetGrid(h, col=index2,row='Object',height=8,aspect=1)
       g.map(sns.histplot, "Scores")
       st.set_option('deprecation.showPyplotGlobalUse', False)
       st.pyplot()
-
+      st.markdown('**Ghi chú:**')
+      st.markdown('- Biểu đồ so sánh điểm các môn đã chọn theo lớp học')
+      st.markdown('- Cột: Các lớp đã chọn')
+      st.markdown('- Hàng: Các môn đã chọn ở mục 1')
+      st.markdown('- Có thể tùy chọn môn, thêm hoặc bớt môn tại bộ lọc')
 def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
   ds_df=number.reset_index().melt(id_vars=[index1,index2,index3],var_name='Object',value_name='Scores')
   if _pass==0:
@@ -288,7 +291,9 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       _ter=terminate.value_counts()
       _ter=_ter.reset_index()
       # a=a.reset_index()
-
+    st.markdown('**Ghi chú:**')
+    st.markdown('- So sánh tỉ lệ Đậu/Rớt các môn học năm nhất và năm 2 của các lớp')
+    st.markdown('- Có thể tùy chọn môn, thêm hoặc bớt môn tại bộ lọc')
     st.markdown('#### 5. TỈ LỆ SINH VIÊN ĐANG THEO HỌC VÀ ĐÃ NGHỈ HỌC')
     ter=_ter.pivot(index=index2,columns=index3,values=0)
     stacked_data3 = ter.apply(lambda x: x*100/sum(x), axis=1)
@@ -403,11 +408,9 @@ def main():
       df = get_df(files)
       choose=st.sidebar.selectbox('Chọn nội dung báo cáo:',['Operation Dashboard','Student checking','Phân nhóm học tập'])
       if choose=='Operation Dashboard':
+        st.markdown('Báo cáo hiển thị kết quả học tập lớp theo môn học. Tùy chỉnh lựa chọn các môn tại bộ lọc để xem kết quả.')
         st.sidebar.markdown('A. XÁC ĐỊNH TRƯỜNG THÔNG TIN')
-        st.sidebar.markdown('Lưu ý thứ tự chọn lần lượt: ')
-        st.sidebar.markdown('Mã sinh viên - Tên lớp - Tình trạng')
-
-        index=st.sidebar.multiselect('Chọn thông tin cần xem báo cáo:',
+        index=st.sidebar.multiselect('Chọn cột chứa Mã sinh viên - Tên lớp - Tình trạng:',
                         df.columns.tolist())
         index1=0
         index2=0
@@ -438,6 +441,8 @@ def main():
           _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
 
           abc(df,index1,index2,index3,number,first_cols,second_cols,_pass)
+          st.markdown("")
+          st.markdown('ĐỂ XUẤT DANH SÁCH SINH VIÊN ĐẬU/RỚT. HÃY CHỌN ĐIỀU KIỆN TẠI MỤC B TRÊN SIDEBAR')
           out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass)
       elif choose=='Student checking':
           st_id=st.sidebar.text_input('Nhập mã sinh viên:',"")
