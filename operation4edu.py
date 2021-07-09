@@ -105,6 +105,7 @@ def clustering(df):
     else:  
       df=df.set_index([index]) 
       obj=st.sidebar.multiselect('CHỌN MÔN HỌC',
+                              numerical_cols.columns.tolist(),
                               numerical_cols.columns.tolist())
       
       kmeans2 = KMeans(n_clusters=4) #number of cluster = 4
@@ -117,7 +118,10 @@ def clustering(df):
       Y["cluster"] = kmeans2.fit_predict(Y)
       Y["cluster"] = Y["cluster"].astype("category")
       Y["cluster"] = kmeans2.labels_
-
+      desc =Y.describe()
+      
+      st.markdown('PHÂN TÍCH TỔNG QUAN')
+      desc
       st.markdown("")
       st.markdown('PHỔ ĐIỂM TRUNG BÌNH')
       mean_df = df.iloc[:,3:25] #Create a temporary df to calculate mean values
@@ -133,7 +137,6 @@ def clustering(df):
       plt.xlabel("Grade per subject")
       plt.show()
       st.pyplot()
-
       # Silhouette Coefficient to find optimal cluster
       from sklearn.metrics import silhouette_score
       silhouette_coefficients = []
@@ -165,7 +168,6 @@ def clustering(df):
       st.markdown('Số nhóm tối ưu có thể chia là: ' + str(max_value))
       st.markdown("")
       number_clus=st.number_input('Nhập số nhóm muốn cluster tại đây:',step=1)
-
       st.markdown('KẾT QUẢ PHÂN NHÓM VỚI CỤM TỐI ƯU')
       st.markdown("")
       if not number_clus:
@@ -180,18 +182,14 @@ def clustering(df):
       kmeans.fit(Y)
       Y["cluster"] = kmeans.labels_
       st.set_option('deprecation.showPyplotGlobalUse', False)
-
       sb.pairplot(data=Y,hue="cluster",palette="viridis", height=4)
       st.pyplot()
       
       Y["cluster"] = kmeans2.fit_predict(Y)
-
       if st.button('LẤY DANH SÁCH KẾT QUẢ'):
     #   #Print student ID based on clustering 
         for i in range(n_clus): 
-
             df_tmp0 = Y.loc[Y.cluster == i] #Cluster level from 0 to 3
-
             st.markdown('Danh sách sinh viên thuộc nhóm {}'.format(i+1))
             df_tmp0=df_tmp0.reset_index()
             df_tmp0
