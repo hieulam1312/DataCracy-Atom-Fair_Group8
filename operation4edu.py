@@ -279,7 +279,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
       stacked_data = _second_df.apply(lambda x: x*100/sum(x), axis=1)
       st.set_option('deprecation.showPyplotGlobalUse', False)
 
-      stacked_data.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"},figsize=(25,30))
+      stacked_data.plot(kind="bar", stacked=True,color={"Rớt": "orange", "Đậu": "blue"})
   
       plt.xlabel("Lớp")
       plt.ylabel("%")
@@ -305,6 +305,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
     # _ter.plot(x=index2, y=['Đã thôi học','Đang theo học'], kind="bar")
     # st.pyplot()
     #warning list 1
+    st.markdown('ĐỂ XUẤT DANH SÁCH SINH VIÊN ĐẬU/RỚT. HÃY CHỌN ĐIỀU KIỆN TẠI MỤC B TRÊN SIDEBAR')
 
 def out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass):
       st.sidebar.markdown('B. TÌM SINH VIÊN RỚT NĂM 1')
@@ -441,8 +442,6 @@ def main():
           _pass=st.sidebar.number_input('Mức điểm qua môn:', step=1)
 
           abc(df,index1,index2,index3,number,first_cols,second_cols,_pass)
-          st.markdown("")
-          st.markdown('ĐỂ XUẤT DANH SÁCH SINH VIÊN ĐẬU/RỚT. HÃY CHỌN ĐIỀU KIỆN TẠI MỤC B TRÊN SIDEBAR')
           out(df,index1,index2,index3,numerical_cols,first_cols,second_cols,_pass)
       elif choose=='Student checking':
           st_id=st.sidebar.text_input('Nhập mã sinh viên:',"")
