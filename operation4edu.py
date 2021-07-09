@@ -220,7 +220,7 @@ def transform(df,first,index2,second):
       h=_h[first] #
       h=h.reset_index()
       h=h.melt(id_vars=index2,var_name='Object',value_name='Scores')
-      g = sns.FacetGrid(h, col=index2,row='Object',height=8,aspect=1)
+      g = sns.FacetGrid(h, col=index2,row='Object',height=10,aspect=0.9)
       g.map(sns.histplot, "Scores")
       st.set_option('deprecation.showPyplotGlobalUse', False)
       st.pyplot()
