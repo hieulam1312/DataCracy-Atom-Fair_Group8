@@ -76,7 +76,7 @@ def check_student(df,id):
 
       fig,ax = plt.subplots()
       data_line = ax.plot(x,y, label='Điểm số', marker='o')
-      mean_line = ax.plot(x,y_mean, label='Trung bình', linestyle='--',color='red')
+      mean_line = ax.plot(x,y_mean, label='Trung bình',color='red')
       # Make a legend
       st.markdown('#### PHỔ ĐIỂM THEO MÔN HỌC')
       legend = ax.legend(loc='upper right')
