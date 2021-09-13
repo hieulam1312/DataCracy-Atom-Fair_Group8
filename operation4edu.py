@@ -223,7 +223,7 @@ def abc(df,index1,index2,index3,number,first_cols,second_cols,_pass):
   if _pass==0:
       st.error('Vui lòng chọn số điểm qua môn để tiếp tục')
   else:
-    row0_1, row0_2 = st.beta_columns(
+    row0_1, row0_2 = st.columns(
     (1, 1))
     with row0_1:
       st.markdown('#### 3. TỈ LỆ GIỮA SINH VIÊN ĐẠT VÀ CHƯA ĐẠT CÁC MÔN NĂM 1')
