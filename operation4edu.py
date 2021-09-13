@@ -384,7 +384,7 @@ def main():
           st.image(img1)
 
           st.markdown('#### C. MỜI BẠN BẮT ĐẦU SỬ DỤNG ỨNG DỤNG')
-          st.write("Hãy tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo")
+          st.write("Hãy tải lên 1 file định dạng .csv or .xlsx để bắt đầu xem báo cáo hoặc tải demo [tại đây](https://docs.google.com/spreadsheets/d/1OSI1Kx9GvM4bckBSt-ewu18WdogjmMr_1vG0pW1c7VI/edit#gid=0)")
 
     else:
       df = get_df(files)
