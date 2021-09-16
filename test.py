@@ -66,10 +66,9 @@ def push_exit_table(df, db_table):
     )
     client = bigquery.Client(credentials=credentials)
 
-    project_id="hp-data-324704"
-
-    pandas_gbq.to_gbq(df,f'DWhandpick.{db_table}', project_id=project_id, if_exists='append')
-
+    project_id="speedy-precept-314204"
+   
+    pandas_gbq.to_gbq(df,f'handpick.{db_table}', project_id=project_id, if_exists='append')
     st.write("Please upload an Excel or CSV file")
 
 
