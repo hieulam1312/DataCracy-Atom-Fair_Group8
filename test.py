@@ -68,7 +68,7 @@ def push_exit_table(df, db_table):
 
     project_id="speedy-precept-314204"
    
-    pandas_gbq.to_gbq(df,f'handpick.{db_table}', project_id=project_id, if_exists='append')
+    pandas_gbq.to_gbq(df,'handpick.test', project_id=project_id, if_exists='replace')
     st.write("Please upload an Excel or CSV file")
 
 
