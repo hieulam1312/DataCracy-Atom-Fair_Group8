@@ -24,5 +24,4 @@ yfinance
 lxml
 win-unicode-console
 xlrd
-openpyx
 command
