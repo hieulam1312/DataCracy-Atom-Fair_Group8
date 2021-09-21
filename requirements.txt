@@ -18,7 +18,7 @@ pandas_gbq
 google_api_python_client
 google-auth-oauthlib
 base58
-
+oauth2client
 
 yfinance
 lxml
