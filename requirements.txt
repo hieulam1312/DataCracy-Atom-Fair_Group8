@@ -19,7 +19,7 @@ google_api_python_client
 google-auth-oauthlib
 base58
 oauth2client
-
+gspread
 yfinance
 lxml
 win-unicode-console
