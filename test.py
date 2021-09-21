@@ -30,7 +30,8 @@ sp=st.multiselect('Chọn sản phẩm',sample['TÊN SẢN PHẨM'].unique())
 table=sample[sample['TÊN SẢN PHẨM'].isin(sp)]
 table_df=table[['TÊN KHÁCH HÀNG','TÊN CHI TIẾT']].reset_index(drop=True)
 table_df['NGÀY'],table_df['THAO TÁC'],table_df['BỘ PHẬN']=today,step,factory
-table_df
+table_=table_df[['TÊN KHÁCH HÀNG','TÊN CHI TIẾT']]
+table_
 # sub_folders=order_df[['TÊN KHÁCH HÀNG','TÊN SẢN PHẨM']]
 # sub_folders.set_index('TÊN KHÁCH HÀNG').T.to_dict('list')
 
@@ -51,26 +52,3 @@ if st.button('Xuất danh sách'):
     updated = existing.append(table_df)
     gd.set_with_dataframe(ws, updated)
 
-
-
-
-# # APPEND DATA TO SHEETimport gspread_dataframe as gd
-# import gspread_dataframe as gd
-# import gspread as gs
-# # gc = gs.service_account(filename="your/cred/file.json")
-
-# def export_to_sheets(worksheet_name,df,mode='r'):
-#     ws = gc1.open("Kho mẫu - Test").worksheet(worksheet_name)
-#     if(mode=='w'):
-#         ws.clear()
-#         gd.set_with_dataframe(worksheet=ws,dataframe=df,include_index=False,include_column_header=True,resize=True)
-#         return True
-#     elif(mode=='a'):
-#         ws.add_rows(df.shape[0])
-#         gd.set_with_dataframe(worksheet=ws,dataframe=df,include_index=False,include_column_header=False,row=ws.row_count+1,resize=False)
-#         return True
-#     else:
-#         return gd.get_as_dataframe(worksheet=ws)
-    
-# # df = pd.DataFrame.from_records([{'a': i, 'b': i * 2} for i in range(100)])
-# export_to_sheets("Sheet2",table_df,'a')
