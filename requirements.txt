@@ -25,3 +25,4 @@ lxml
 win-unicode-console
 xlrd
 command
+gspread_dataframe
